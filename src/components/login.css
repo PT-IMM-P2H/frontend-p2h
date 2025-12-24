@@ -4,7 +4,7 @@
   flex:auto;
   width: 100vw;
   height: 100vh;
-  background-image: url('/Image Asset/bg-form.jpg');
+  background-image: url('/image_asset/bg-form.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -22,7 +22,7 @@
   width: 400px;
   height: auto;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,20 +42,35 @@
 
 .form-content {
   width: 100%;
-  padding: 40px 30px;
+  padding: 20px 30px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 .form-content p {
   margin: 0 0 -5px 0;
   text-align: center;
   color: #333;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   font-family: 'Montserrat', sans-serif;
-  
+}
+
+.form-content p.monitor-notes {
+  margin: -10px 0 0 0;
+  text-align: left;
+  color: #ff6464;
+  font-size: 12px;
+  font-weight: 100;
+  text-decoration: underline;
+}
+
+hr {
+  border: none;
+  border-top: 4px solid #c6c6c6;
+  border-radius: 8px;
+  margin: 2px;
 }
 
 .form-group {
@@ -130,7 +145,7 @@
   padding: 12px 15px;
   border: 1px solid #a1a1a1;
   background-color: #ffffff;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-family: 'Montserrat', sans-serif;
   color: #333;
@@ -167,7 +182,7 @@
 
 .sign-in-btn {
   padding: 12px;
-  background-color: #646cff;
+  background-color: #523E95;
   color: white;
   border: none;
   border-radius: 6px;
@@ -178,7 +193,40 @@
 }
 
 .sign-in-btn:hover {
-  background-color: #535bf2;
+  background-color: #453281;
+}
+
+.monitor-btn {
+  padding: 12px;
+  background-color: #4994df;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.monitor-btn:hover {
+  background-color: #397cc0;
+}
+
+.monitor-notes {
+  font-size: 13px;
+  
+  font-weight: 100;
+  color: #ff6464;
+  text-decoration: none;
+  position: left;
+  transition: color 0.3s;
+}
+
+.nomor-wa {
+    color: #646cff;
+    font-weight: 500;
+    text-decoration: none;
+    text-decoration: underline;
 }
 
 /* Modal Styles */

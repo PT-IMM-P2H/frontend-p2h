@@ -13,7 +13,7 @@ const router = createRouter({
             path: '/form-p2h',
             name: 'form-p2h',
             component: () => import('../components/user/P2HForm/p2h_form.vue')
-        }
+        },
     ],
     scrollBehavior(to, from, savedPosition){
         return {top: 0}

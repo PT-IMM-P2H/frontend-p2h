@@ -26,6 +26,12 @@ export default {
     },
     handleSignIn() {
       this.$router.push('/form-p2h')
+    },
+    handleMonitorKendaraan() {
+      this.$router.push('')
+    },
+    handleWaLink() {
+      window.open('https://wa.me/6282254442400', '_blank')
     }
   },
 
@@ -36,7 +42,7 @@ export default {
     <div class="login-container">
         <div class="form-box">
             <div class="form-content">
-                <img src="/Image Asset/IMM.svg" alt="IMM Logo" class="logo">
+                <img src="/image_asset/IMM.svg" alt="IMM Logo" class="logo">
                 <p>Welcome to Pelaksanaan Pemeriksaan Harian</p>
                 <div class="form-group">
                     <input type="tel" placeholder="Nomor Handphone" class="form-input">
@@ -67,6 +73,13 @@ export default {
                 <button class="sign-in-btn" @click="handleSignIn">
                   Sign In
                 </button>
+                <hr />
+                <button class="monitor-btn" @click="handleMonitorKendaraan">
+                  Monitor kendaraan
+                </button>
+                    <p class="monitor-notes">
+                      *Notes : Anda dapat mengakses monitor kendaraan tanpa perlu login
+                    </p>
             </div>
         </div>
 
@@ -75,17 +88,17 @@ export default {
             <div class="modal-box">
                 <h3>Silahkan hubungi OH OnCall IMM agar kami dapat memberikan informasi lebih lanjut tentang password anda.</h3>
                 <p class="flex items-center gap-2">
-                  <PhoneIcon class="w-5 h-5 text-blue-500 flex-shrink-0" />
-                  <span>OH OnCall (Klinik 30) : 0812-5511-185</span>
+                  <PhoneIcon class="w-5 h-5 text-blue-500 shrink-0" />
+                  <span>Rizal Rahmadani :</span>
+                  <a href="#" class="nomor-wa" @click.prevent="handleWaLink">
+                    0822-5444-2400
+                  </a>
                 </p>
-                <p class="flex items-center gap-2">
+                <!-- <p class="flex items-center gap-2">
                   <PhoneIcon class="w-5 h-5 text-blue-500 flex-shrink-0" />
                   <span>OH OnCall (Klinik Port) : 0812-5511-183</span>
                 </p>
-                <p class="flex items-center gap-2">
-                  <PhoneIcon class="w-5 h-5 text-blue-500 flex-shrink-0" />
-                  <span>Abustan : 0852-4717-8478</span>
-                </p>
+                -->
                 <button class="modal-close-btn" @click="closeForgotPasswordModal">Close</button>
             </div>
         </div>

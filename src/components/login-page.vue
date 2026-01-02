@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { EyeIcon, EyeSlashIcon, PhoneIcon } from "@heroicons/vue/24/solid";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/solid";
+import { PhoneIcon } from "@heroicons/vue/24/outline";
 
 const router = useRouter();
 const showPassword = ref(false);
@@ -130,21 +131,22 @@ const handleWaLink = () => {
         class="bg-white p-10 rounded-lg text-center max-w-130 m-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)]"
       >
         <h3
-          class="text-[#333] text-[16px] font-regular mb-5 leading-normal text-left mt-0"
+          class="text-[#333] text-[17px] font-regular mb-5 leading-normal text-left mt-0"
         >
           Silahkan hubungi Admin OnCall IMM agar kami dapat memberikan informasi
           lebih lanjut tentang password anda.
         </h3>
 
         <p
-          class="text-[#333] text-[15px] mb-5 leading-normal text-left mt-5 flex items-center gap-3"
+          class="text-[#333] text-[16px] mb-5 leading-normal text-left mt-5 flex items-center gap-3"
         >
-          <PhoneIcon class="shrink-0 w-4 h-4 text-[#3b82f6]" />
+          <PhoneIcon class="shrink-0 w-5 h-5 text-[#3b82f6]" />
           <span class="font-bold"> Rizal Rahmadani :</span>
           <a
             href="#"
             @click.prevent="handleWaLink"
-            class="text-[#646cff] text-[15px] font-medium underline"
+            class="text-[#646cff] text-[16px] font-medium underline decoration-1"
+            style="text-decoration: underline; text-decoration-thickness: 1.2px; text-underline-offset: 3px;"
           >
             0822-5444-2400
           </a>

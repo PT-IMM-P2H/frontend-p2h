@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import LoginSection from '../components/login_page.vue';
+import LoginSection from '../components/login-page.vue';
 </script>

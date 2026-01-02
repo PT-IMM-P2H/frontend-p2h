@@ -1,32 +1,21 @@
 <script>
-import NavBar from '../../navbar.vue'
+import NavBar from '../../bar/navbar.vue'
 
 export default {
   components: {
     NavBar
   },
-  methods: {
-    goBack() {
-      this.$router.back()
-    }
-  }
 }
+
 </script>
 
 <template>
   <div
     class="fixed inset-0 w-full h-full flex items-center justify-center bg-cover bg-center bg-no-repeat bg-fixed z-10 font-['Montserrat']"
-    :style="{ backgroundImage: 'url(/image_asset/bg-form.jpg)' }"
+    :style="{ backgroundImage: 'url(image_asset/Backgrond.png)' }"
   >
     <NavBar />
 
-    <!-- Back Button -->
-    <button 
-        @click="goBack"
-        class="absolute top-24 left-6 bg-white hover:bg-gray-100 text-white-800 font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 z-20"
-    >
-        ← Kembali
-    </button>
 
     <!-- Form Container -->
     <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl mx-4 z-20 mt-16">

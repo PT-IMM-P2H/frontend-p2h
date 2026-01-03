@@ -25,7 +25,7 @@ const handleSignIn = () => {
 };
 
 const handleMonitorKendaraan = () => {
-  console.log("Monitor Kendaraan clicked");
+  router.push("/monitor-kendaraan");
 };
 
 const handleWaLink = () => {
@@ -115,7 +115,7 @@ const handleWaLink = () => {
         </div>
 
         <p
-          class="m-0 -mt-2.5 text-left text-[#ff6464] text-[12px] font-bold underline"
+          class="m-0 mt-0 text-left text-[#ff6464] text-[12px] font-bold underline"
         >
           *Notes : Anda dapat mengakses monitor kendaraan tanpa perlu login
         </p>

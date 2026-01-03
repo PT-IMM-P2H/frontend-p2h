@@ -1,6 +1,6 @@
 <script setup>
-import Aside from "../bar/aside.vue";
-import HeaderAdmin from "../bar/header_admin.vue";
+import Aside from "../../bar/aside.vue";
+import HeaderAdmin from "../../bar/header_admin.vue";
 </script>
 
 <template>
@@ -18,10 +18,10 @@ import HeaderAdmin from "../bar/header_admin.vue";
         >
           <div class="p-3 m-2.5 bg-white rounded-lg shadow-lg w-full max-w-2xl">
             <h1 class="text-2xl font-bold mb-4 text-gray-800 text-center">
-              Form P2H
+              Data Monitor PT.IMM
             </h1>
             <p class="text-gray-600 text-center">
-              Konten form akan muncul di sini.
+              Konten data monitor PT.IMM akan muncul di sini.
             </p>
           </div>
         </main>

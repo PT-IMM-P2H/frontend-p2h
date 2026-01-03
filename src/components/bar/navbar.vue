@@ -22,6 +22,16 @@ const hadleformp2h = () => {
   isMenuOpen.value = false;
 };
 
+const hadledashboard = () => {
+  router.push({ name: "dashboard" });
+  isMenuOpen.value = false;
+};
+
+const hadlemonitor= () => {
+  router.push({ name: "monitor-kendaraan" });
+  isMenuOpen.value = false;
+};
+
 const currentRoute = computed(() => router.currentRoute.value.name);
 
 const getButtonClass = (routeName) => {
@@ -64,6 +74,17 @@ const closeMenu = () => {
 
     <!-- Desktop Navigation -->
     <nav class="hidden md:flex items-center gap-8">
+      <!-- viewer monitor kendaraan -->
+      <button
+        @click="hadlemonitor"
+        :class="getButtonClass('monitor-kendaraan')"
+        :style="{ color: getButtonColor('monitor-kendaraan') }"
+        class="hover:opacity-80 transition-colors"
+      >
+        Log Kendaraan
+      </button>
+
+      <!-- User -->
       <button
         @click="hadleformp2h"
         :class="getButtonClass('form-p2h')"
@@ -87,6 +108,16 @@ const closeMenu = () => {
         class="hover:opacity-80 transition-colors"
       >
         Profile
+      </button>
+
+      <!-- admin -->
+      <button
+        @click="hadledashboard"
+        :class="getButtonClass('dashboard')"
+        :style="{ color: getButtonColor('dashboard') }"
+        class="hover:opacity-80 transition-colors"
+      >
+        Dashboard
       </button>
 
       <button

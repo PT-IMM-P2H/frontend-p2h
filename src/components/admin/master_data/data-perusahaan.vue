@@ -1,6 +1,6 @@
 <script setup>
-import Aside from "../bar/aside.vue";
-import HeaderAdmin from "../bar/header_admin.vue";
+import Aside from "../../bar/aside.vue";
+import HeaderAdmin from "../../bar/header_admin.vue";
 </script>
 
 <template>

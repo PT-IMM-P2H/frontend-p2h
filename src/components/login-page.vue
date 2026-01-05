@@ -122,7 +122,7 @@ const handleWaLink = () => {
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Forgot Password -->
     <div
       v-if="showForgotPasswordModal"
       class="fixed inset-0 bg-black/70 flex items-center justify-center z-1000"
@@ -133,7 +133,7 @@ const handleWaLink = () => {
         <h3
           class="text-[#333] text-[17px] font-regular mb-5 leading-normal text-left mt-0"
         >
-          Silahkan hubungi Admin OnCall IMM agar kami dapat memberikan informasi
+          Silahkan hubungi Admin Transportasi Manajemen IMM agar kami dapat memberikan informasi
           lebih lanjut tentang password anda.
         </h3>
 

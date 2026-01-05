@@ -13,8 +13,7 @@ import HeaderAdmin from "../bar/header_admin.vue";
 
         <!-- Content -->
         <main
-          class="flex-1 flex items-center justify-center bg-cover bg-center bg-no-repeat"
-          style="background-image: url(/image_asset/Backgrond.png)"
+          class="bg-[#EFEFEF] flex-1 flex items-center justify-center bg-cover bg-center bg-no-repeat""
         >
           <div class="p-3 m-2.5 bg-white rounded-lg shadow-lg w-full max-w-2xl">
             <h1 class="text-2xl font-bold mb-4 text-gray-800 text-center">

@@ -1,5 +1,5 @@
 <script setup>
-import NavBar from "../bar/navbar.vue";
+import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
 import { InformationCircleIcon } from "@heroicons/vue/24/solid";
 </script>
@@ -11,7 +11,7 @@ import { InformationCircleIcon } from "@heroicons/vue/24/solid";
 
     <!-- Content -->
     <main
-      class="flex-1 flex items-start md:items-center justify-center bg-cover bg-center bg-no-repeat px-4 pt-24 md:pt-16 pb-40 md:pb-32 overflow-y-auto"
+      class="flex-1 flex items-start md:items-center justify-center bg-cover bg-center bg-no-repeat px-4 pt-24 md:pt-20 pb-40 md:pb-32 overflow-y-auto"
       style="background-image: url(/image_asset/Backgrond.png)"
     >
       <div class="flex flex-col w-full max-w-5xl gap-4">

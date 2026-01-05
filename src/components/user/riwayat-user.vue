@@ -1,10 +1,24 @@
-<script setup>
-import NavBar from "../bar/navbar.vue";
+<script setup lang="ts">
+import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
 import { ArrowLongDownIcon, ArrowLongUpIcon } from "@heroicons/vue/24/outline";
 import { ref, computed } from "vue";
 
-const riwayatData = ref([
+interface RiwayatItem {
+  tanggal: string;
+  noLambung: string;
+  merek: string;
+  tipe: string;
+  nomorPolisi: string;
+  hasil: "Normal" | "Abnormal" | "Warning";
+}
+
+interface HasilStyle {
+  bg: string;
+  text: string;
+}
+
+const riwayatData = ref<RiwayatItem[]>([
   {
     tanggal: "2025-01-05",
     noLambung: "001",
@@ -55,23 +69,23 @@ const riwayatData = ref([
   },
 ]);
 
-const currentPage = ref(1);
-const itemsPerPage = 5;
-const sortOrder = ref("desc"); // 'asc' untuk ascending, 'desc' untuk descending
+const currentPage = ref<number>(1);
+const itemsPerPage: number = 5;
+const sortOrder = ref<"asc" | "desc">("desc");
 
-const sortByDate = () => {
+const sortByDate = (): void => {
   if (sortOrder.value === "desc") {
     sortOrder.value = "asc";
-    riwayatData.value.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+    riwayatData.value.sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime());
   } else {
     sortOrder.value = "desc";
-    riwayatData.value.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    riwayatData.value.sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
   }
-  currentPage.value = 1; // Reset ke halaman pertama
+  currentPage.value = 1;
 };
 
-const getHasilStyle = (hasil) => {
-  const styles = {
+const getHasilStyle = (hasil: string): HasilStyle => {
+  const styles: Record<string, HasilStyle> = {
     "Normal": { bg: "#A7E8BF", text: "#1A5C3F" },
     "Abnormal": { bg: "#F7E19C", text: "#8B6F47" },
     "Warning": { bg: "#FFA0A0", text: "#8B3A3A" }
@@ -79,31 +93,31 @@ const getHasilStyle = (hasil) => {
   return styles[hasil] || styles["Normal"];
 };
 
-const paginatedData = computed(() => {
+const paginatedData = computed<RiwayatItem[]>(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   return riwayatData.value.slice(start, end);
 });
 
-const totalPages = computed(() => {
+const totalPages = computed<number>(() => {
   return Math.ceil(riwayatData.value.length / itemsPerPage);
 });
 
-const startIndex = computed(() => {
+const startIndex = computed<number>(() => {
   return (currentPage.value - 1) * itemsPerPage + 1;
 });
 
-const endIndex = computed(() => {
+const endIndex = computed<number>(() => {
   return Math.min(currentPage.value * itemsPerPage, riwayatData.value.length);
 });
 
-const previousPage = () => {
+const previousPage = (): void => {
   if (currentPage.value > 1) {
     currentPage.value--;
   }
 };
 
-const nextPage = () => {
+const nextPage = (): void => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }

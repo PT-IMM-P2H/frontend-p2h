@@ -65,7 +65,7 @@ const closeMenu = () => {
       <div class="h-6 md:h-8 w-0.5 bg-[#cacaca] rounded-lg shrink-0"></div>
 
       <span
-        class="font-['Montserrat'] font-semibold text-sm md:text-md text-[#523E95] truncate">
+        class="font-['Montserrat'] font-semibold text-md md:text-md text-[#523E95] truncate">
         Pelaksanaan Pemeriksaan Harian
       </span>
     </div>

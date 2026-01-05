@@ -6,21 +6,20 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path:'/login',
+            path: '/login',
             name: 'login',
-            component : LoginPage
+            component: LoginPage
         },
         {
-            path:'/',
+            path: '/',
             name: 'main',
-            component : Main
+            component: Main
         },
         {
             path: '/monitor-kendaraan',
             name: 'monitor-kendaraan',
             component: () => import('../components/viewer/monitor.vue')
         },
-
         {
             path: '/form-p2h',
             name: 'form-p2h',
@@ -102,9 +101,9 @@ const router = createRouter({
             component: () => import('../components/admin/profil-admin.vue')
         },
     ],
-    scrollBehavior(to, from, savedPosition){
-        return {top: 0}
-    }    
+    scrollBehavior(to, from, savedPosition) {
+        return { top: 0 }
+    }
 })
 
 export default router;

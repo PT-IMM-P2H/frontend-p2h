@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-import NavBar from "../bar/navbar.vue";
+import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
 import {
   XMarkIcon,
@@ -8,13 +8,13 @@ import {
   ChevronRightIcon,
 } from "@heroicons/vue/24/solid";
 
-const showEditAkun = ref(false);
+const showEditAkun = ref<boolean>(false);
 
-const openEditAkun = () => {
+const openEditAkun = (): void => {
   showEditAkun.value = true;
 };
 
-const closeEditAkun = () => {
+const closeEditAkun = (): void => {
   showEditAkun.value = false;
 };
 </script>

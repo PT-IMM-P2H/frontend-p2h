@@ -144,7 +144,7 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <aside class="w-62 h- bg-white flex flex-col shadow-lg overflow-y-auto border-r border-gray-200">
+  <aside class="w-62 h-screen bg-white flex flex-col shadow-lg overflow-y-auto border-r border-gray-200">
     <!-- Logo Section -->
     <div class="px-5 py-3 border-b border-gray-300 text-center">
       <img src="/image_asset/IMM.svg" alt="Logo P2H" class="h-12 w-auto mx-auto" />

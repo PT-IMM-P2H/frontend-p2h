@@ -35,7 +35,7 @@ const closeEditAkun = () => {
         <div class="flex justify-end">
           <button
             @click="openEditAkun"
-            class="px-7 py-1 text-xs md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white font-light rounded-md hover:opacity-90 transition"
+            class="px-7 py-1 text-xs md:text-sm font-semilight bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-md hover:opacity-90 transition"
           >
             Edit akun
           </button>
@@ -44,19 +44,19 @@ const closeEditAkun = () => {
         <!-- Nama dan Email -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <p class="text-sm font-regular text-gray-800 mb-1">Nama Lengkap</p>
+            <p class="text-base font-regular text-gray-800 mb-1">Nama</p>
             <input
               type="text"
               placeholder="Nama Lengkap"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
           <div>
-            <p class="text-sm font-regular text-gray-800 mb-1">Email</p>
+            <p class="text-base font-regular text-gray-800 mb-1">Email</p>
             <input
               type="text"
               placeholder="email"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
         </div>
@@ -64,51 +64,59 @@ const closeEditAkun = () => {
         <!-- Nomor Telepon, Tanggal Lahir, dan Perusahaan -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
-            <p class="text-sm font-regular text-gray-800 mb-1">Nomor Telepon</p>
+            <p class="text-base font-regular text-gray-800 mb-1">
+              Nomor Telepon
+            </p>
             <input
               type="text"
               placeholder="081xxxxxxxx"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
           <div>
-            <p class="text-sm font-regular text-gray-800 mb-1">Tanggal Lahir</p>
+            <p class="text-base font-regular text-gray-800 mb-1">
+              Tanggal Lahir
+            </p>
             <input
               type="text"
               placeholder="DD/MM/YYYY"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
           <div>
-            <p class="text-sm font-regular text-gray-800 mb-1">Perusahaan</p>
+            <p class="text-base font-regular text-gray-800 mb-1">Perusahaan</p>
             <input
               type="text"
               placeholder="Perusahaan"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
         </div>
+        <div>
+          <p class="text-base font-regular text-gray-800 mb-1">Departemen</p>
+          <input
+            type="text"
+            placeholder="Departemen"
+            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
+          />
+        </div>
+        <div>
+          <p class="text-base font-regular text-gray-800 mb-1">Status karyawan</p>
+          <input
+            type="text"
+            placeholder="Status karyawan"
+            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
+          />
+        </div>
 
-        <p class="text-1xl font-regular text-gray-800">Departemen</p>
-        <input
-          type="text"
-          placeholder="Departemen"
-          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
-        />
-
-        <p class="text-1xl font-regular text-gray-800">Status karyawan</p>
-        <input
-          type="text"
-          placeholder="Status karyawan"
-          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
-        />
-
-        <p class="text-1xl font-regular text-gray-800">Posisi kerja</p>
-        <input
-          type="text"
-          placeholder="Posisi kerja"
-          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
-        />
+        <div>
+          <p class="text-base font-regular text-gray-800 mb-1">Posisi kerja</p>
+          <input
+            type="text"
+            placeholder="Posisi kerja"
+            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
+          />
+        </div>
       </div>
 
       <!-- Kontent Edit akun -->
@@ -117,7 +125,7 @@ const closeEditAkun = () => {
         class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
       >
         <div
-          class="bg-white rounded-lg w-full max-w-md md:max-w-lg max-h-[90vh] overflow-y-auto shadow-[0_4px_6px_rgba(0,0,0,0.1)] p-6 md:p-8"
+          class="bg-white rounded-lg w-full max-w-md md:max-w-xl max-h-[90vh] overflow-y-auto shadow-[0_4px_6px_rgba(0,0,0,0.1)] p-6 md:p-8"
         >
           <div
             class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200"
@@ -134,14 +142,14 @@ const closeEditAkun = () => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-black mb-2 mt-4"
+            <label class="block text-base font-medium text-black mb-2 mt-4"
               >Nama Lengkap</label
             >
             <div class="relative">
               <input
                 type="text"
                 placeholder="Masukkan nama"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
               <PencilSquareIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -149,14 +157,14 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Nomor Handphone</label
             >
             <div class="relative">
               <input
                 type="text"
                 placeholder="081xxxxxxxx"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
               <PencilSquareIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -164,14 +172,14 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Perusahaan</label
             >
             <div class="relative">
               <input
                 type="text"
                 placeholder="Nama perusahaan"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
               <ChevronRightIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -179,14 +187,14 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Departemen</label
             >
             <div class="relative">
               <input
                 type="text"
                 placeholder="Nama departemen"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
               <ChevronRightIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -194,14 +202,14 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Posisi kerja</label
             >
             <div class="relative">
               <input
                 type="text"
                 placeholder="Posisi kerja"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
               <ChevronRightIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"

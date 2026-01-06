@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref } from "vue";
 import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
@@ -8,13 +8,13 @@ import {
   ChevronRightIcon,
 } from "@heroicons/vue/24/solid";
 
-const showEditAkun = ref<boolean>(false);
+const showEditAkun = ref(false);
 
-const openEditAkun = (): void => {
+const openEditAkun = () => {
   showEditAkun.value = true;
 };
 
-const closeEditAkun = (): void => {
+const closeEditAkun = () => {
   showEditAkun.value = false;
 };
 </script>
@@ -48,7 +48,7 @@ const closeEditAkun = (): void => {
             <input
               type="text"
               placeholder="Nama Lengkap"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md"
+              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
           <div>
@@ -56,7 +56,7 @@ const closeEditAkun = (): void => {
             <input
               type="text"
               placeholder="email"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md"
+              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
         </div>
@@ -68,7 +68,7 @@ const closeEditAkun = (): void => {
             <input
               type="text"
               placeholder="081xxxxxxxx"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md"
+              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
           <div>
@@ -76,7 +76,7 @@ const closeEditAkun = (): void => {
             <input
               type="text"
               placeholder="DD/MM/YYYY"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md"
+              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
           <div>
@@ -84,7 +84,7 @@ const closeEditAkun = (): void => {
             <input
               type="text"
               placeholder="Perusahaan"
-              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md"
+              class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
         </div>
@@ -93,21 +93,21 @@ const closeEditAkun = (): void => {
         <input
           type="text"
           placeholder="Departemen"
-          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md mb-1"
+          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
         />
 
         <p class="text-1xl font-regular text-gray-800">Status karyawan</p>
         <input
           type="text"
           placeholder="Status karyawan"
-          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md mb-1"
+          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
         />
 
         <p class="text-1xl font-regular text-gray-800">Posisi kerja</p>
         <input
           type="text"
           placeholder="Posisi kerja"
-          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#C3C3C3] rounded-md mb-1"
+          class="w-full p-2 border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
         />
       </div>
 
@@ -134,14 +134,14 @@ const closeEditAkun = (): void => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-800 mb-2 mt-4"
+            <label class="block text-sm font-medium text-black mb-2 mt-4"
               >Nama Lengkap</label
             >
             <div class="relative">
               <input
                 type="text"
                 placeholder="Masukkan nama"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-[#EEEEEE] text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
               />
               <PencilSquareIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -156,7 +156,7 @@ const closeEditAkun = (): void => {
               <input
                 type="text"
                 placeholder="081xxxxxxxx"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-[#EEEEEE] text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
               />
               <PencilSquareIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -171,7 +171,7 @@ const closeEditAkun = (): void => {
               <input
                 type="text"
                 placeholder="Nama perusahaan"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-[#EEEEEE] text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
               />
               <ChevronRightIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -186,7 +186,7 @@ const closeEditAkun = (): void => {
               <input
                 type="text"
                 placeholder="Nama departemen"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-[#EEEEEE] text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
               />
               <ChevronRightIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -201,7 +201,7 @@ const closeEditAkun = (): void => {
               <input
                 type="text"
                 placeholder="Posisi kerja"
-                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-[#EEEEEE] text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
               />
               <ChevronRightIcon
                 class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"

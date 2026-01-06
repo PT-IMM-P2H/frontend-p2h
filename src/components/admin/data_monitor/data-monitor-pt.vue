@@ -7,6 +7,8 @@ import { MagnifyingGlassIcon, Bars3BottomLeftIcon, ArrowUpTrayIcon, TrashIcon } 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
 const searchQuery = ref("");
+const currentPage = ref(1);
+const itemsPerPage = 10;
 
 const tableData = ref([
   {
@@ -50,7 +52,121 @@ const tableData = ref([
     kategoriLayanan: "Pertambangan",
     perusahaan: "PT Indominco Mandiri",
     hasil: "Warning"
-  }
+  },
+    {
+    id: 4,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+    {
+    id: 5,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+    {
+    id: 6,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+      {
+    id: 7,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+      {
+    id: 8,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+      {
+    id: 9,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+      {
+    id: 10,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+        {
+    id: 11,
+    tanggal: "28/12/2025",
+    waktu: "22:45:00",
+    noLambung: "KD-003",
+    nomorPolisi: "B 9012 KLS",
+    tipe: "Dump Truck",
+    merek: "Isuzu",
+    namaPemeriksa: "Ahmad Wijaya",
+    shift: "Malam",
+    kategoriLayanan: "Pertambangan",
+    perusahaan: "PT Indominco Mandiri",
+    hasil: "Warning"
+  },
+
+
 ]);
 
 const selectRow = (rowId) => {
@@ -95,22 +211,58 @@ const getResultColor = (hasil) => {
   return styles[hasil] || styles["Normal"];
 };
 
+// Helper function untuk normalize string (hapus whitespace dan karakter khusus)
+const normalizeString = (str) => {
+  return str.toLowerCase().replace(/[\s\-./]/g, '');
+};
+
 // Filter data berdasarkan search query
 const filteredTableData = computed(() => {
   if (!searchQuery.value.trim()) {
     return tableData.value;
   }
   
-  const query = searchQuery.value.toLowerCase();
+  const query = normalizeString(searchQuery.value);
   return tableData.value.filter(row => {
     return (
-      row.namaPemeriksa.toLowerCase().includes(query) ||
-      row.noLambung.toLowerCase().includes(query) ||
-      row.nomorPolisi.toLowerCase().includes(query) ||
-      row.merek.toLowerCase().includes(query)
+      normalizeString(row.namaPemeriksa).includes(query) ||
+      normalizeString(row.noLambung).includes(query) ||
+      normalizeString(row.nomorPolisi).includes(query) ||
+      normalizeString(row.merek).includes(query)
     );
   });
 });
+
+// Pagination computed
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredTableData.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredTableData.value.length / itemsPerPage);
+});
+
+const startIndex = computed(() => {
+  return (currentPage.value - 1) * itemsPerPage + 1;
+});
+
+const endIndex = computed(() => {
+  return Math.min(currentPage.value * itemsPerPage, filteredTableData.value.length);
+});
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
 </script>
 
 <template>
@@ -127,7 +279,7 @@ const filteredTableData = computed(() => {
           
           <!-- Judul -->
           <div class="bg-white rounded-lg shadow-md p-1 pl-5 mb-2 -mt-1 shrink-0">
-            <h1 class="text-lg font-bold text-[#523E95] text-left">
+            <h1 class="text-sm font-bold text-[#523E95] text-left">
               PT Indominco Mandiri
             </h1>
           </div>
@@ -139,6 +291,7 @@ const filteredTableData = computed(() => {
                 <MagnifyingGlassIcon class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"/>
                 <input 
                   v-model="searchQuery"
+                  @input="currentPage = 1"
                   type="text" 
                   placeholder="Cari nama..."
                   class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -173,8 +326,8 @@ const filteredTableData = computed(() => {
             </div>
 
             <!-- Table Container with Horizontal Scroll -->
-            <div class="flex-1 flex flex-col gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-hidden">
-              <div class="overflow-x-auto overflow-y-auto rounded-lg border bg-white">
+            <div class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden">
+              <div class="overflow-x-auto overflow-y-auto rounded-lg border bg-white max-h-105">
                 <table class="w-full border-collapse">
                   <thead>
                     <tr class="border-b-2 border-gray-400 bg-gray-50">
@@ -189,21 +342,21 @@ const filteredTableData = computed(() => {
                           title="Pilih semua / Batal pilih semua"
                         />
                       </th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-32">Tanggal / Waktu</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-24">No. Lambung</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-28">Nomor Polisi</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-20">Tipe</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-20">Merek</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-28">Nama Pemeriksa</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-20">Shift</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-28">Kategori Layanan</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-28">Perusahaan</th>
-                      <th class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-20">Hasil</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-32">Tanggal / Waktu</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-24">No. Lambung</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28">Nomor Polisi</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20">Tipe</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20">Merek</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28">Nama Pemeriksa</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20">Shift</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28">Kategori Layanan</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28">Perusahaan</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20">Hasil</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr 
-                      v-for="row in filteredTableData" 
+                      v-for="row in paginatedData" 
                       :key="row.id"
                       class="border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer"
                       :class="{ 'bg-blue-50': isRowSelected(row.id) }"
@@ -220,18 +373,18 @@ const filteredTableData = computed(() => {
                         />
                       </td>
                       <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-32">
-                        <div class="text-sm">{{ row.tanggal }}</div>
-                        <div class="text-sm text-gray-600">{{ row.waktu }}</div>
+                        <div class="text-xs">{{ row.tanggal }}</div>
+                        <div class="text-xs text-gray-600">{{ row.waktu }}</div>
                       </td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-24">{{ row.noLambung }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-28">{{ row.nomorPolisi }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-20">{{ row.tipe }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-20">{{ row.merek }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-28">{{ row.namaPemeriksa }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-20">{{ row.shift }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-28">{{ row.kategoriLayanan }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-28">{{ row.perusahaan }}</td>
-                      <td class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-20">
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-24">{{ row.noLambung }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28">{{ row.nomorPolisi }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20">{{ row.tipe }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20">{{ row.merek }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28">{{ row.namaPemeriksa }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20">{{ row.shift }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28">{{ row.kategoriLayanan }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28">{{ row.perusahaan }}</td>
+                      <td class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20">
                         <span class="px-3 py-1 rounded-full text-sm font-semibold" :style="{ backgroundColor: getResultColor(row.hasil).bg, color: getResultColor(row.hasil).text }">
                           {{ row.hasil }}
                         </span>
@@ -239,6 +392,29 @@ const filteredTableData = computed(() => {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              <!-- Pagination -->
+              <div class="flex flex-col md:flex-row justify-between md:justify-end items-center gap-3 md:gap-4 pt-3 md:pt-4 border-t border-gray-200">
+                <span class="text-xs md:text-sm text-gray-700 font-medium order-2 md:order-1">
+                  {{ startIndex }} - {{ endIndex }} of {{ filteredTableData.length }}
+                </span>
+                <div class="flex gap-2 order-1 md:order-2">
+                  <button
+                    @click="previousPage"
+                    :disabled="currentPage === 1"
+                    class="px-2 md:px-3 py-1 md:py-2 border border-gray-300 rounded-md text-gray-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    @click="nextPage"
+                    :disabled="currentPage === totalPages"
+                    class="px-2 md:px-3 py-1 md:py-2 border border-gray-300 rounded-md text-gray-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition"
+                  >
+                    &gt;
+                  </button>
+                </div>
               </div>
             </div>
           </div>

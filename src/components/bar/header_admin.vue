@@ -1,9 +1,15 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { UserCircleIcon } from '@heroicons/vue/24/outline'
 
+const router = useRouter()
 const currentDate = ref('')
 const adminName = ref('Naufal Andrian')
+
+const goToProfile = () => {
+  router.push('/profil-admin')
+}
 
 onMounted(() => {
   // Format tanggal hari ini
@@ -27,10 +33,13 @@ onMounted(() => {
         <p class="text-[15px] font-semibold text-gray-800">{{ adminName }}</p>
         <p class="text-xs text-gray-500">Administrator</p>
       </div>
-      <!-- User Circle Icon -->
-      <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-        <UserCircleIcon class="w-10 h-10 text-black" />
-      </div>
+      <!-- User Circle Icon Button -->
+      <button 
+        @click="goToProfile"
+        class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center hover:bg-indigo-200 transition-colors duration-200 cursor-pointer"
+      >
+        <UserCircleIcon class="w-10 h-10 text-black hover:text-indigo-600 transition-colors duration-200" />
+      </button>
     </div>
   </div>
 </template>

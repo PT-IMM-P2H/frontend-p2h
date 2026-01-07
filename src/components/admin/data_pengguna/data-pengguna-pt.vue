@@ -13,10 +13,11 @@ import {
   PencilSquareIcon,
   XMarkIcon,
   ChevronDownIcon,
-  CalendarIcon,
   ArrowUpIcon,
   ArrowDownIcon,
+  CheckIcon,
 } from "@heroicons/vue/24/outline";
+import {PencilIcon, CalendarIcon} from "@heroicons/vue/24/solid";
 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
@@ -195,10 +196,14 @@ const nextPage = () => {
 const sortByName = () => {
   if (sortOrder.value === "asc") {
     sortOrder.value = "desc";
-    tableData.value = [...tableData.value].sort((a, b) => b.namaLengkap.localeCompare(a.namaLengkap));
+    tableData.value = [...tableData.value].sort((a, b) =>
+      b.namaLengkap.localeCompare(a.namaLengkap)
+    );
   } else {
     sortOrder.value = "asc";
-    tableData.value = [...tableData.value].sort((a, b) => a.namaLengkap.localeCompare(b.namaLengkap));
+    tableData.value = [...tableData.value].sort((a, b) =>
+      a.namaLengkap.localeCompare(b.namaLengkap)
+    );
   }
   currentPage.value = 1;
 };
@@ -318,29 +323,25 @@ const sortByName = () => {
                       <th
                         class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-12"
                       >
-                        <input
-                          type="checkbox"
-                          :checked="selectAllChecked"
-                          @change="toggleSelectAll"
-                          class="w-5 h-5 cursor-pointer rounded-md border-2 border-gray-600 bg-white"
-                          style="
-                            appearance: none;
-                            -webkit-appearance: none;
-                            -moz-appearance: none;
-                          "
-                          :style="
-                            selectAllChecked
-                              ? {
-                                  backgroundColor: '#3b82f6',
-                                  borderColor: '#3b82f6',
-                                }
-                              : {
-                                  backgroundColor: 'white',
-                                  borderColor: '#4b5563',
-                                }
-                          "
-                          title="Pilih semua / Batal pilih semua"
-                        />
+                        <div class="relative w-5 h-5">
+                          <input
+                            type="checkbox"
+                            :checked="selectAllChecked"
+                            @change="toggleSelectAll"
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
+                            style="
+                              appearance: none;
+                              -webkit-appearance: none;
+                              -moz-appearance: none;
+                            "
+                            title="Pilih semua / Batal pilih semua"
+                          />
+                          <!-- Check Icon -->
+                          <CheckIcon
+                            v-if="selectAllChecked"
+                            class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
+                          />
+                        </div>
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-32 cursor-pointer hover:bg-gray-100 transition"
@@ -348,7 +349,10 @@ const sortByName = () => {
                       >
                         <div class="flex items-center gap-2">
                           <span>Nama Lengkap</span>
-                          <ArrowDownIcon v-if="sortOrder === 'asc'" class="w-4 h-4" />
+                          <ArrowDownIcon
+                            v-if="sortOrder === 'asc'"
+                            class="w-4 h-4"
+                          />
                           <ArrowUpIcon v-else class="w-4 h-4" />
                         </div>
                       </th>
@@ -392,29 +396,25 @@ const sortByName = () => {
                       :class="{ 'bg-blue-50': isRowSelected(row.id) }"
                     >
                       <td class="px-4 py-3 whitespace-nowrap min-w-12">
-                        <input
-                          type="checkbox"
-                          :checked="isRowSelected(row.id)"
-                          @change="selectRow(row.id)"
-                          @click.stop
-                          class="w-5 h-5 cursor-pointer rounded-md border-2"
-                          style="
-                            appearance: none;
-                            -webkit-appearance: none;
-                            -moz-appearance: none;
-                          "
-                          :style="
-                            isRowSelected(row.id)
-                              ? {
-                                  backgroundColor: '#3b82f6',
-                                  borderColor: '#3b82f6',
-                                }
-                              : {
-                                  backgroundColor: 'white',
-                                  borderColor: '#4b5563',
-                                }
-                          "
-                        />
+                        <div class="relative w-5 h-5">
+                          <input
+                            type="checkbox"
+                            :checked="isRowSelected(row.id)"
+                            @change="selectRow(row.id)"
+                            @click.stop
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
+                            style="
+                              appearance: none;
+                              -webkit-appearance: none;
+                              -moz-appearance: none;
+                            "
+                          />
+                          <!-- Check Icon -->
+                          <CheckIcon
+                            v-if="isRowSelected(row.id)"
+                            class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
+                          />
+                        </div>
                       </td>
                       <td
                         class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-32 text-xs"
@@ -522,11 +522,16 @@ const sortByName = () => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Nama Lengkap</label
                     >
-                    <input
-                      type="text"
-                      placeholder="Masukkan nama"
-                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                    />
+                    <div class="relative">
+                      <input
+                        type="text"
+                        placeholder="Masukkan nama"
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                      />
+                      <PencilIcon
+                        class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -534,11 +539,16 @@ const sortByName = () => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Nomor Telepon</label
                     >
-                    <input
-                      type="text"
-                      placeholder="081xxxxxxxx"
-                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                    />
+                    <div class="relative">
+                      <input
+                        type="text"
+                        placeholder="081xxxxxxxx"
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                      />
+                      <PencilIcon
+                        class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -549,11 +559,16 @@ const sortByName = () => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Email</label
                     >
-                    <input
-                      type="text"
-                      placeholder="email@example.com"
-                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                    />
+                    <div class="relative">
+                      <input
+                        type="text"
+                        placeholder="email@example.com"
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                      />
+                      <PencilIcon
+                        class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -640,7 +655,7 @@ const sortByName = () => {
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                       />
                       <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#b2b2b2]"
                       />
                     </div>
                   </div>

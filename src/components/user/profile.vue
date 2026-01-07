@@ -30,13 +30,11 @@ const closeEditAkun = () => {
       style="background-image: url(/image_asset/Backgrond.png)"
     >
       <div
-        class="w-full h-auto flex flex-col gap-4 bg-white rounded-xl shadow-lg max-w-2xl md:max-w-4xl p-4 md:p-7 mt-2 md:mt-0"
-      >
+        class="w-full h-auto flex flex-col gap-4 bg-white rounded-xl shadow-lg max-w-2xl md:max-w-4xl p-4 md:p-7 mt-2 md:mt-0">
         <div class="flex justify-end">
           <button
             @click="openEditAkun"
-            class="px-7 py-1 text-xs md:text-sm font-semilight bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-md hover:opacity-90 transition"
-          >
+            class="px-7 py-1 text-xs md:text-sm font-semilight bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-md hover:opacity-90 transition">
             Edit akun
           </button>
         </div>
@@ -55,7 +53,7 @@ const closeEditAkun = () => {
             <p class="text-base font-regular text-gray-800 mb-1">Email</p>
             <input
               type="text"
-              placeholder="email"
+              placeholder="email@example.com"
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>
@@ -79,7 +77,7 @@ const closeEditAkun = () => {
             </p>
             <input
               type="text"
-              placeholder="DD/MM/YYYY"
+              placeholder="hh/bb/tttt"
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
           </div>

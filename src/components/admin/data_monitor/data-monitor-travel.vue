@@ -10,6 +10,7 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   CalendarIcon,
+  CheckIcon,
 } from "@heroicons/vue/24/outline";
 
 const selectedRowIds = ref([]);
@@ -286,29 +287,27 @@ const nextPage = () => {
                       <th
                         class="px-4 py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-12"
                       >
-                        <input
-                          type="checkbox"
-                          :checked="selectAllChecked"
-                          @change="toggleSelectAll"
-                          class="w-5 h-5 cursor-pointer rounded-md border-2 border-gray-600 bg-white"
-                          style="
-                            appearance: none;
-                            -webkit-appearance: none;
-                            -moz-appearance: none;
-                          "
-                          :style="
-                            selectAllChecked
-                              ? {
-                                  backgroundColor: '#3b82f6',
-                                  borderColor: '#3b82f6',
-                                }
-                              : {
-                                  backgroundColor: 'white',
-                                  borderColor: '#4b5563',
-                                }
-                          "
-                          title="Pilih semua / Batal pilih semua"
-                        />
+                        <div class="relative w-5 h-5">
+                          <input
+                            type="checkbox"
+                            :checked="selectAllChecked"
+                            @change="toggleSelectAll"
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none
+                                  bg-white border-gray-600
+                                  checked:bg-blue-500 checked:border-blue-500"
+                            style="
+                              appearance: none;
+                              -webkit-appearance: none;
+                              -moz-appearance: none;
+                            "
+                            title="Pilih semua / Batal pilih semua"
+                          />
+                          <!-- Check Icon -->
+                          <CheckIcon
+                            v-if="selectAllChecked"
+                            class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
+                          />
+                        </div>
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-32"
@@ -365,29 +364,23 @@ const nextPage = () => {
                       :class="{ 'bg-blue-50': isRowSelected(row.id) }"
                     >
                       <td class="px-4 py-3 whitespace-nowrap min-w-12">
-                        <input
-                          type="checkbox"
-                          :checked="isRowSelected(row.id)"
-                          @change="selectRow(row.id)"
-                          @click.stop
-                          class="w-5 h-5 cursor-pointer rounded-md border-2"
-                          style="
-                            appearance: none;
-                            -webkit-appearance: none;
-                            -moz-appearance: none;
-                          "
-                          :style="
-                            isRowSelected(row.id)
-                              ? {
-                                  backgroundColor: '#3b82f6',
-                                  borderColor: '#3b82f6',
-                                }
-                              : {
-                                  backgroundColor: 'white',
-                                  borderColor: '#4b5563',
-                                }
-                          "
-                        />
+                        <div class="relative w-5 h-5">
+                          <input
+                            type="checkbox"
+                            :checked="isRowSelected(row.id)"
+                            @change="selectRow(row.id)"
+                            @click.stop
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none
+                                  bg-white border-gray-600
+                                  checked:bg-blue-500 checked:border-blue-500"
+                          />
+
+                          <!-- Check Icon -->
+                          <CheckIcon
+                            v-if="isRowSelected(row.id)"
+                            class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
+                          />
+                        </div>
                       </td>
                       <td
                         class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-32"

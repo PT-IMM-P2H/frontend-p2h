@@ -144,8 +144,6 @@ const filteredTableData = computed(() => {
     const query = normalizeString(searchQuery.value);
     filtered = filtered.filter((row) => {
       return (
-        normalizeString(row.nomorLambung).includes(query) ||
-        normalizeString(row.warnaNomorLambung).includes(query) ||
         normalizeString(row.nomorPolisi).includes(query) ||
         normalizeString(row.tipe).includes(query) ||
         normalizeString(row.merek).includes(query) ||
@@ -166,14 +164,9 @@ const filteredTableData = computed(() => {
       (row) => row.merek === appliedFilterData.value.posisi
     );
   }
-  if (appliedFilterData.value.status) {
-    filtered = filtered.filter(
-      (row) => row.warnaNomorLambung === appliedFilterData.value.status
-    );
-  }
   if (appliedFilterData.value.namaPerusahaan) {
     filtered = filtered.filter(
-      (row) => row.namaPerusahaan === appliedFilterData.value.namaPerusahaan
+      (row) => row.perusahaan === appliedFilterData.value.namaPerusahaan
     );
   }
 
@@ -639,13 +632,13 @@ const getDateStyle = (dateString) => {
                       >Tipe</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih tipe kendaraan"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih tipe kendaraan</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
@@ -675,13 +668,13 @@ const getDateStyle = (dateString) => {
                       >Perusahaan</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih nama perusahaan"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih nama perusahaan</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
@@ -823,14 +816,14 @@ const getDateStyle = (dateString) => {
                     >Nama Perusahaan</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.namaPerusahaan"
-                      type="text"
-                      placeholder="Pilih Perusahaan"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Perusahaan</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>
@@ -842,14 +835,14 @@ const getDateStyle = (dateString) => {
                     >Tipe Kendaraan</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.departemen"
-                      type="text"
-                      placeholder="Pilih Tipe"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Tipe</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>
@@ -861,14 +854,14 @@ const getDateStyle = (dateString) => {
                     >Merek</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.posisi"
-                      type="text"
-                      placeholder="Pilih Merek"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Merek</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>

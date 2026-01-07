@@ -24,7 +24,6 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const tambahUnitKendaraan = ref(false);
 const showFilter = ref(false);
-const sortOrder = ref("asc");
 const filterData = ref({
   departemen: "",
   posisi: "",
@@ -281,7 +280,7 @@ const getDateStyle = (dateString) => {
                   class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-white bg-[#6444C6] hover:bg-[#5c3db8] transition text-sm"
                 >
                   <UserPlusIcon class="w-5 h-5" />
-                  <span>Tambah unit kendaraan</span>
+                  <span>Tambah Unit Kendaraan</span>
                 </button>
 
                 <!-- Upload button -->
@@ -576,7 +575,7 @@ const getDateStyle = (dateString) => {
                   class="flex justify-between items-center mb-2 pb-3 border-b border-gray-200"
                 >
                   <h2 class="text-lg md:text-xl font-semibold text-gray-900">
-                    Tambah unit kendaraan
+                    Tambah Unit Kendaraan Travel
                   </h2>
                   <button
                     @click="closeTambahUnitKendaraan"
@@ -684,16 +683,10 @@ const getDateStyle = (dateString) => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Tanggal STNK</label
                     >
-                    <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="hh/bb/tttt"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
-                      <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                      />
-                    </div>
+                    <input
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
                   </div>
                 </div>
 
@@ -703,16 +696,10 @@ const getDateStyle = (dateString) => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Tanggal Pajak</label
                     >
-                    <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="hh/bb/tttt"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
-                      <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                      />
-                    </div>
+                    <input
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
                   </div>
 
                   <div>
@@ -720,16 +707,10 @@ const getDateStyle = (dateString) => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >KIR / KUER</label
                     >
-                    <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="hh/bb/tttt"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
-                      <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                      />
-                    </div>
+                    <input
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
                   </div>
                 </div>
 
@@ -872,16 +853,10 @@ const getDateStyle = (dateString) => {
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
                     >Tanggal STNK</label
                   >
-                  <div class="relative">
-                    <input
-                      type="text"
-                      placeholder="hh/bb/tttt"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
-                    <CalendarIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
                 </div>
 
                 <!-- Tanggal Pajak -->
@@ -890,16 +865,10 @@ const getDateStyle = (dateString) => {
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
                     >Tanggal Pajak</label
                   >
-                  <div class="relative">
-                    <input
-                      type="text"
-                      placeholder="hh/bb/tttt"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
-                    <CalendarIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
                 </div>
 
                 <!-- Tanggal KIR / KUER -->
@@ -908,16 +877,10 @@ const getDateStyle = (dateString) => {
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
                     >Tanggal KIR / KUER</label
                   >
-                  <div class="relative">
-                    <input
-                      type="text"
-                      placeholder="hh/bb/tttt"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
-                    <CalendarIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
                 </div>
 
                 <div class="flex justify-center gap-3 mt-6">

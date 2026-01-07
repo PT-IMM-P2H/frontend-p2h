@@ -5,11 +5,19 @@ import HeaderAdmin from "../bar/header_admin.vue";
 import {
   XMarkIcon,
   PencilSquareIcon,
-  ChevronRightIcon,
-  CalendarIcon
 } from "@heroicons/vue/24/solid";
 
 const showEditAkun = ref(false);
+
+// Dummy data
+const adminName = ref('Naufal Andrian');
+const adminEmail = ref('naufal@indominco.com');
+const adminNoTelepon = ref('081234567890');
+const adminTanggalLahir = ref('1990-05-15');
+const adminPerusahaan = ref('PT Indominco Mandiri');
+const adminDepartemen = ref('IT Department');
+const adminStatusKaryawan = ref('Permanent');
+const adminPosisiKerja = ref('System Administrator');
 
 const openEditAkun = () => {
   showEditAkun.value = true;
@@ -47,17 +55,21 @@ const closeEditAkun = () => {
               <div>
                 <p class="text-base font-regular text-gray-800 mb-1">Nama</p>
                 <input
+                  v-model="adminName"
                   type="text"
                   placeholder="Nama Lengkap"
-                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                  disabled
+                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
                 />
               </div>
               <div>
                 <p class="text-base font-regular text-gray-800 mb-1">Email</p>
                 <input
+                  v-model="adminEmail"
                   type="text"
                   placeholder="email@example.com"
-                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                  disabled
+                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
                 />
               </div>
             </div>
@@ -69,9 +81,11 @@ const closeEditAkun = () => {
                   Nomor Telepon
                 </p>
                 <input
+                  v-model="adminNoTelepon"
                   type="text"
                   placeholder="081xxxxxxxx"
-                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                  disabled
+                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
                 />
               </div>
               <div>
@@ -79,9 +93,11 @@ const closeEditAkun = () => {
                   Tanggal Lahir
                 </p>
                 <input
+                  v-model="adminTanggalLahir"
                   type="text"
                   placeholder="hh/bb/tttt"
-                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                  disabled
+                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
                 />
               </div>
             </div>
@@ -92,9 +108,11 @@ const closeEditAkun = () => {
                 Perusahaan
               </p>
               <input
+                v-model="adminPerusahaan"
                 type="text"
                 placeholder="Perusahaan"
-                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                disabled
+                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
               />
             </div>
 
@@ -104,9 +122,11 @@ const closeEditAkun = () => {
                 Departemen
               </p>
               <input
+                v-model="adminDepartemen"
                 type="text"
                 placeholder="Departemen"
-                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                disabled
+                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
               />
             </div>
 
@@ -116,9 +136,11 @@ const closeEditAkun = () => {
                 Status karyawan
               </p>
               <input
+                v-model="adminStatusKaryawan"
                 type="text"
                 placeholder="Status karyawan"
-                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                disabled
+                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
               />
             </div>
 
@@ -128,9 +150,11 @@ const closeEditAkun = () => {
                 Posisi kerja
               </p>
               <input
+                v-model="adminPosisiKerja"
                 type="text"
                 placeholder="Posisi kerja"
-                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+                disabled
+                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
               />
             </div>
           </div>
@@ -211,24 +235,24 @@ const closeEditAkun = () => {
                   class="block text-base font-medium text-gray-800 mb-2 mt-2"
                   >Tanggal Lahir</label
                 >
-                <div class="relative">
-                  <input
-                    type="text"
-                    placeholder="hh/bb/tttt"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <CalendarIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
-                  />
-                </div>
+                <input
+                  type="date"
+                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                />
               </div>
               
 
-              <div class="flex justify-center mt-6">
+              <div class="flex justify-end gap-3 mt-6">
                 <button
                   class="px-8 md:px-10 py-2 text-sm md:text-base bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
                 >
                   Simpan
+                </button>
+                <button
+                  @click="closeEditAkun"
+                  class="px-6 md:px-6 py-2 text-sm md:text-base border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
+                >
+                  Batal
                 </button>
               </div>
             </div>

@@ -5,7 +5,7 @@ import Footer from "../bar/footer.vue";
 import {
   XMarkIcon,
   PencilSquareIcon,
-  ChevronRightIcon,
+  ChevronDownIcon,
 } from "@heroicons/vue/24/solid";
 
 const showEditAkun = ref(false);
@@ -174,13 +174,13 @@ const closeEditAkun = () => {
               >Perusahaan</label
             >
             <div class="relative">
-              <input
-                type="text"
-                placeholder="Nama perusahaan"
-                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-              />
-              <ChevronRightIcon
-                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+              <select
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
+              >
+                <option value="">Pilih perusahaan</option>
+              </select>
+              <ChevronDownIcon
+                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3] pointer-events-none"
               />
             </div>
           </div>
@@ -189,13 +189,13 @@ const closeEditAkun = () => {
               >Departemen</label
             >
             <div class="relative">
-              <input
-                type="text"
-                placeholder="Nama departemen"
-                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-              />
-              <ChevronRightIcon
-                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+              <select
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
+              >
+                <option value="">Pilih departemen</option>
+              </select>
+              <ChevronDownIcon
+                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3] pointer-events-none"
               />
             </div>
           </div>
@@ -204,13 +204,13 @@ const closeEditAkun = () => {
               >Posisi kerja</label
             >
             <div class="relative">
-              <input
-                type="text"
-                placeholder="Posisi kerja"
-                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-              />
-              <ChevronRightIcon
-                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+              <select
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
+              >
+                <option value="">Pilih posisi kerja</option>
+              </select>
+              <ChevronDownIcon
+                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3] pointer-events-none"
               />
             </div>
           </div>

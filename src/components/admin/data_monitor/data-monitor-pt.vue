@@ -29,9 +29,18 @@ const appliedFilterHasil = ref({
   abnormal: false,
   warning: false,
 });
+const filterDate = ref({
+  startDate: "",
+  endDate: "",
+});
+const appliedFilterDate = ref({
+  startDate: "",
+  endDate: "",
+});
 
 const applyFilter = () => {
   appliedFilterHasil.value = { ...filterHasil.value };
+  appliedFilterDate.value = { ...filterDate.value };
   currentPage.value = 1;
   closeFilter();
 };
@@ -137,6 +146,12 @@ const normalizeString = (str) => {
   return str.toLowerCase().replace(/[\s\-./]/g, "");
 };
 
+// Helper function untuk parse tanggal dari format DD/MM/YYYY ke Date object
+const parseDate = (dateString) => {
+  const [day, month, year] = dateString.split("/");
+  return new Date(year, parseInt(month) - 1, day);
+};
+
 // Filter data berdasarkan search query dan hasil
 const filteredTableData = computed(() => {
   let filtered = tableData.value;
@@ -168,6 +183,27 @@ const filteredTableData = computed(() => {
       if (row.hasil === "Warning" && appliedFilterHasil.value.warning)
         return true;
       return false;
+    });
+  }
+
+  // Filter berdasarkan date range
+  if (appliedFilterDate.value.startDate || appliedFilterDate.value.endDate) {
+    filtered = filtered.filter((row) => {
+      const rowDate = parseDate(row.tanggal);
+      
+      if (appliedFilterDate.value.startDate) {
+        const startDate = new Date(appliedFilterDate.value.startDate);
+        if (rowDate < startDate) return false;
+      }
+      
+      if (appliedFilterDate.value.endDate) {
+        const endDate = new Date(appliedFilterDate.value.endDate);
+        // Set end date to end of day
+        endDate.setHours(23, 59, 59, 999);
+        if (rowDate > endDate) return false;
+      }
+      
+      return true;
     });
   }
 
@@ -516,32 +552,22 @@ const nextPage = () => {
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
                     >Start Date</label
                   >
-                  <div class="relative">
-                    <input
-                      type="text"
-                      placeholder="hh / bb / tttt"
-                      class="w-full p-2 pr-10 text-xs border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
-                    <CalendarIcon
-                      class="absolute right-3 top-2.5 w-4 h-4 text-[#4b4b4b]"
-                    />
-                  </div>
+                  <input
+                    v-model="filterDate.startDate"
+                    type="date"
+                    class="w-full p-2 text-xs border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
                 </div>
                 <div>
                   <label
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
                     >End Date</label
                   >
-                  <div class="relative">
-                    <input
-                      type="text"
-                      placeholder="hh / bb / tttt"
-                      class="w-full p-2 pr-10 text-xs border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
-                    <CalendarIcon
-                      class="absolute right-3 top-2.5 w-4 h-4 text-[#4b4b4b]"
-                    />
-                  </div>
+                  <input
+                    v-model="filterDate.endDate"
+                    type="date"
+                    class="w-full p-2 text-xs border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
                 </div>
               </div>
 
@@ -638,13 +664,13 @@ const nextPage = () => {
                   >Nama Perusahaan</label
                 >
                 <div class="relative">
-                  <input
-                    type="text"
-                    placeholder="Pilih Perusahaan"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                  />
+                  <select
+                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                  >
+                    <option value="">Pilih Perusahaan</option>
+                  </select>
                   <ChevronDownIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                   />
                 </div>
               </div>
@@ -655,30 +681,30 @@ const nextPage = () => {
                   >Departemen</label
                 >
                 <div class="relative">
-                  <input
-                    type="text"
-                    placeholder="Pilih Departemen"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                  />
+                  <select
+                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                  >
+                    <option value="">Pilih Departemen</option>
+                  </select>
                   <ChevronDownIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                   />
                 </div>
               </div>
 
-              <!-- Departemen -->
+              <!-- Posisi Kerja -->
               <div>
                 <label class="block text-sm font-medium text-gray-800 mb-2 mt-2"
                   >Posisi Kerja</label
                 >
                 <div class="relative">
-                  <input
-                    type="text"
-                    placeholder="Pilih Posisi Kerja"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                  />
+                  <select
+                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                  >
+                    <option value="">Pilih Posisi Kerja</option>
+                  </select>
                   <ChevronDownIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                   />
                 </div>
               </div>
@@ -689,13 +715,13 @@ const nextPage = () => {
                   >Status Kerja</label
                 >
                 <div class="relative">
-                  <input
-                    type="text"
-                    placeholder="Pilih Status Kerja"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                  />
+                  <select
+                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                  >
+                    <option value="">Pilih Status Kerja</option>
+                  </select>
                   <ChevronDownIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                    class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                   />
                 </div>
               </div>

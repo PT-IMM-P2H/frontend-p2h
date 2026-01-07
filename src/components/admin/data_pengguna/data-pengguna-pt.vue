@@ -577,13 +577,13 @@ const sortByName = () => {
                       >Nama Perusahaan</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih nama perusahaan"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih nama perusahaan</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
@@ -597,13 +597,13 @@ const sortByName = () => {
                       >Departemen</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih departemen"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih departemen</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
@@ -613,19 +613,19 @@ const sortByName = () => {
                       >Posisi</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih posisi"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih posisi</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
                 </div>
 
-                <!-- Row 4: Status Pekerjaan -->
+                <!-- Row 4: Status Pekerjaan dan Tanggal Lahir -->
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
@@ -633,13 +633,13 @@ const sortByName = () => {
                       >Status Pekerjaan</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih status pekerjaan"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih status pekerjaan</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
@@ -648,16 +648,10 @@ const sortByName = () => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Tanggal Lahir</label
                     >
-                    <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="hh/bb/tttt"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
-                      <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#b2b2b2]"
-                      />
-                    </div>
+                    <input
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
                   </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-4">
@@ -667,13 +661,13 @@ const sortByName = () => {
                       >Role</label
                     >
                     <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="Pilih role"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih role</option>
+                      </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
@@ -726,14 +720,14 @@ const sortByName = () => {
                     >Nama Perusahaan</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.namaPerusahaan"
-                      type="text"
-                      placeholder="Pilih Perusahaan"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Perusahaan</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>
@@ -745,14 +739,14 @@ const sortByName = () => {
                     >Departemen</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.departemen"
-                      type="text"
-                      placeholder="Pilih Departemen"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Departemen</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>
@@ -764,14 +758,14 @@ const sortByName = () => {
                     >Posisi Kerja</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.posisi"
-                      type="text"
-                      placeholder="Pilih Posisi Kerja"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Posisi Kerja</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>
@@ -783,14 +777,14 @@ const sortByName = () => {
                     >Status Kerja</label
                   >
                   <div class="relative">
-                    <input
+                    <select
                       v-model="filterData.status"
-                      type="text"
-                      placeholder="Pilih Status Kerja"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
-                    />
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Status Kerja</option>
+                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
                 </div>

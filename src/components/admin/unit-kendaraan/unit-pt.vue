@@ -17,7 +17,7 @@ import {
   ArrowDownIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
-import { PencilIcon, CalendarIcon} from "@heroicons/vue/24/solid";
+import { PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
@@ -153,10 +153,13 @@ const filteredTableData = computed(() => {
     const query = normalizeString(searchQuery.value);
     filtered = filtered.filter((row) => {
       return (
-        normalizeString(row.namaLengkap).includes(query) ||
-        normalizeString(row.noHandphone).includes(query) ||
-        normalizeString(row.departemen).includes(query) ||
-        normalizeString(row.posisi).includes(query)
+        normalizeString(row.nomorLambung).includes(query) ||
+        normalizeString(row.warnaNomorLambung).includes(query) ||
+        normalizeString(row.nomorPolisi).includes(query) ||
+        normalizeString(row.tipe).includes(query) ||
+        normalizeString(row.merek).includes(query) ||
+        normalizeString(row.user).includes(query) ||
+        normalizeString(row.perusahaan).includes(query)
       );
     });
   }
@@ -164,17 +167,17 @@ const filteredTableData = computed(() => {
   // Filter berdasarkan filter yang diterapkan
   if (appliedFilterData.value.departemen) {
     filtered = filtered.filter(
-      (row) => row.departemen === appliedFilterData.value.departemen
+      (row) => row.tipe === appliedFilterData.value.departemen
     );
   }
   if (appliedFilterData.value.posisi) {
     filtered = filtered.filter(
-      (row) => row.posisi === appliedFilterData.value.posisi
+      (row) => row.merek === appliedFilterData.value.posisi
     );
   }
   if (appliedFilterData.value.status) {
     filtered = filtered.filter(
-      (row) => row.status === appliedFilterData.value.status
+      (row) => row.warnaNomorLambung === appliedFilterData.value.status
     );
   }
   if (appliedFilterData.value.namaPerusahaan) {
@@ -223,19 +226,23 @@ const nextPage = () => {
 const sortByName = () => {
   if (sortOrder.value === "asc") {
     sortOrder.value = "desc";
-    tableData.value = [...tableData.value].sort((a, b) => b.nomorLambung.localeCompare(a.nomorLambung));
+    tableData.value = [...tableData.value].sort((a, b) =>
+      b.nomorLambung.localeCompare(a.nomorLambung)
+    );
   } else {
     sortOrder.value = "asc";
-    tableData.value = [...tableData.value].sort((a, b) => a.nomorLambung.localeCompare(b.nomorLambung));
+    tableData.value = [...tableData.value].sort((a, b) =>
+      a.nomorLambung.localeCompare(b.nomorLambung)
+    );
   }
   currentPage.value = 1;
 };
 
 const getWarnaNomorLambungStyle = (warna) => {
   const styles = {
-    "Kuning": { bg: "#F7E19C", text: "#8B6F47" },
-    "Hijau": { bg: "#A7E8BF", text: "#1A5C3F" },
-    "Biru": { bg: "#A8D4FF", text: "#0C5460" }
+    Kuning: { bg: "#F7E19C", text: "#8B6F47" },
+    Hijau: { bg: "#A7E8BF", text: "#1A5C3F" },
+    Biru: { bg: "#A8D4FF", text: "#0C5460" },
   };
   return styles[warna] || { bg: "#E2E3E5", text: "#383D41" };
 };
@@ -243,22 +250,34 @@ const getWarnaNomorLambungStyle = (warna) => {
 const getDateStyle = (dateString) => {
   // Parse tanggal format "DD Bulan YYYY"
   const bulanMap = {
-    "Januari": 0, "Februari": 1, "Maret": 2, "April": 3, "Mei": 4, "Juni": 5,
-    "Juli": 6, "Agustus": 7, "September": 8, "Oktober": 9, "November": 10, "Desember": 11
+    Januari: 0,
+    Februari: 1,
+    Maret: 2,
+    April: 3,
+    Mei: 4,
+    Juni: 5,
+    Juli: 6,
+    Agustus: 7,
+    September: 8,
+    Oktober: 9,
+    November: 10,
+    Desember: 11,
   };
-  
+
   const parts = dateString.split(" ");
   const day = parseInt(parts[0]);
   const month = bulanMap[parts[1]];
   const year = parseInt(parts[2]);
-  
+
   const targetDate = new Date(year, month, day);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   // Hitung selisih bulan
-  const monthDiff = (targetDate.getFullYear() - today.getFullYear()) * 12 + (targetDate.getMonth() - today.getMonth());
-  
+  const monthDiff =
+    (targetDate.getFullYear() - today.getFullYear()) * 12 +
+    (targetDate.getMonth() - today.getMonth());
+
   if (monthDiff === 1) {
     return { bg: "#FFE5E5", text: "#C41E3A" }; // Merah
   } else if (monthDiff === 2) {
@@ -325,7 +344,7 @@ const getDateStyle = (dateString) => {
                     v-model="searchQuery"
                     @input="currentPage = 1"
                     type="text"
-                    placeholder="Cari nama..."
+                    placeholder="Cari..."
                     class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -388,9 +407,7 @@ const getDateStyle = (dateString) => {
                             type="checkbox"
                             :checked="selectAllChecked"
                             @change="toggleSelectAll"
-                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none
-                                  bg-white border-gray-600
-                                  checked:bg-blue-500 checked:border-blue-500"
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
                             style="
                               appearance: none;
                               -webkit-appearance: none;
@@ -411,7 +428,10 @@ const getDateStyle = (dateString) => {
                       >
                         <div class="flex items-center gap-2">
                           <span>Nomor lambung</span>
-                          <ArrowDownIcon v-if="sortOrder === 'asc'" class="w-4 h-4" />
+                          <ArrowDownIcon
+                            v-if="sortOrder === 'asc'"
+                            class="w-4 h-4"
+                          />
                           <ArrowUpIcon v-else class="w-4 h-4" />
                         </div>
                       </th>
@@ -423,12 +443,12 @@ const getDateStyle = (dateString) => {
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
                       >
-                      Nomor Polisi
+                        Nomor Polisi
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20"
                       >
-                      Tipe
+                        Tipe
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20"
@@ -491,9 +511,7 @@ const getDateStyle = (dateString) => {
                             :checked="isRowSelected(row.id)"
                             @change="selectRow(row.id)"
                             @click.stop
-                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none
-                                  bg-white border-gray-600
-                                  checked:bg-blue-500 checked:border-blue-500"
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
                             style="
                               appearance: none;
                               -webkit-appearance: none;
@@ -512,12 +530,17 @@ const getDateStyle = (dateString) => {
                       >
                         {{ row.nomorLambung }}
                       </td>
-                      <td
-                        class="px-4 py-3 text-xs whitespace-nowrap min-w-24"
-                      >
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-24">
                         <span
                           class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                          :style="{ backgroundColor: getWarnaNomorLambungStyle(row.warnaNomorLambung).bg, color: getWarnaNomorLambungStyle(row.warnaNomorLambung).text }"
+                          :style="{
+                            backgroundColor: getWarnaNomorLambungStyle(
+                              row.warnaNomorLambung
+                            ).bg,
+                            color: getWarnaNomorLambungStyle(
+                              row.warnaNomorLambung
+                            ).text,
+                          }"
                         >
                           {{ row.warnaNomorLambung }}
                         </span>
@@ -547,32 +570,35 @@ const getDateStyle = (dateString) => {
                       >
                         {{ row.perusahaan }}
                       </td>
-                      <td
-                        class="px-4 py-3 text-xs whitespace-nowrap min-w-28"
-                      >
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-28">
                         <span
                           class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                          :style="{ backgroundColor: getDateStyle(row.tglSTNK).bg, color: getDateStyle(row.tglSTNK).text }"
+                          :style="{
+                            backgroundColor: getDateStyle(row.tglSTNK).bg,
+                            color: getDateStyle(row.tglSTNK).text,
+                          }"
                         >
                           {{ row.tglSTNK }}
                         </span>
                       </td>
-                      <td
-                        class="px-4 py-3 text-xs whitespace-nowrap min-w-28"
-                      >
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-28">
                         <span
                           class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                          :style="{ backgroundColor: getDateStyle(row.tglPajak).bg, color: getDateStyle(row.tglPajak).text }"
+                          :style="{
+                            backgroundColor: getDateStyle(row.tglPajak).bg,
+                            color: getDateStyle(row.tglPajak).text,
+                          }"
                         >
                           {{ row.tglPajak }}
                         </span>
                       </td>
-                      <td
-                        class="px-4 py-3 text-xs whitespace-nowrap min-w-28"
-                      >
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-28">
                         <span
                           class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                          :style="{ backgroundColor: getDateStyle(row.kirKuer).bg, color: getDateStyle(row.kirKuer).text }"
+                          :style="{
+                            backgroundColor: getDateStyle(row.kirKuer).bg,
+                            color: getDateStyle(row.kirKuer).text,
+                          }"
                         >
                           {{ row.kirKuer }}
                         </span>

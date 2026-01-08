@@ -101,9 +101,19 @@ const router = createRouter({
             component: () => import('../components/admin/unit-kendaraan/unit-pt.vue')
         },
         {
+            path: '/edit-unit-pt/:id',
+            name: 'edit-unit-pt',
+            component: () => import('../components/admin/unit-kendaraan/edit-unit-pt.vue')
+        },
+        {
             path: '/unit-kendaraan-travel',
             name: 'unit-kendaraan-travel',
             component: () => import('../components/admin/unit-kendaraan/unit-travel.vue')
+        },
+        {
+            path: '/edit-unit-travel/:id',
+            name: 'edit-unit-travel',
+            component: () => import('../components/admin/unit-kendaraan/edit-unit-travel.vue')
         },
         {
             path: '/profil-admin',

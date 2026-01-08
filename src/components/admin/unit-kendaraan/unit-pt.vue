@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
 import {
@@ -17,7 +18,9 @@ import {
   ArrowDownIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
-import { PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+
+const router = useRouter();
 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
@@ -137,6 +140,14 @@ const toggleSelectAll = () => {
 
 const isRowSelected = (rowId) => {
   return selectedRowIds.value.includes(rowId);
+};
+
+const editKendaraan = (rowId) => {
+  const vehicleData = tableData.value.find(row => row.id === rowId);
+  if (vehicleData) {
+    localStorage.setItem('currentVehicleData', JSON.stringify(vehicleData));
+  }
+  router.push(`/edit-unit-pt/${rowId}`);
 };
 
 // Helper function untuk normalize string (hapus whitespace dan karakter khusus)
@@ -617,6 +628,7 @@ const getDateStyle = (dateString) => {
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-16"
                       >
                         <button
+                          @click="editKendaraan(row.id)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon

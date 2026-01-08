@@ -109,6 +109,8 @@ const routeToMenuMap = {
   '/data-status': 'masterdata-status',
   '/unit-kendaraan-pt': 'masterdata-vehicle-imm',
   '/unit-kendaraan-travel': 'masterdata-vehicle-travel',
+  '/edit-unit-pt/:id': 'masterdata-vehicle-imm',
+  '/edit-unit-travel/:id': 'masterdata-vehicle-travel',
   '/profil-admin': 'profile'
 }
 
@@ -123,6 +125,10 @@ const updateActiveMenuFromRoute = () => {
       menuId = 'users-imm'
     } else if (currentPath.match(/^\/edit-data-pengguna-travel\//)) {
       menuId = 'users-travel'
+    } else if (currentPath.match(/^\/edit-unit-pt\//)) {
+      menuId = 'masterdata-vehicle-imm'
+    } else if (currentPath.match(/^\/edit-unit-travel\//)) {
+      menuId = 'masterdata-vehicle-travel'
     }
   }
   

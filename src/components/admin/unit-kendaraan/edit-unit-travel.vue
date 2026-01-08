@@ -37,27 +37,25 @@ const closeEditAkun = () => {
 };
 
 const goBack = () => {
-  router.push("/unit-kendaraan-pt");
+  router.push("/unit-kendaraan-travel");
 };
 
 // Load vehicle data dari localStorage berdasarkan ID
 onMounted(() => {
-  const vehicleData = localStorage.getItem('currentVehicleData');
+  const vehicleData = localStorage.getItem("currentVehicleData");
   if (vehicleData) {
     const vehicle = JSON.parse(vehicleData);
-    nomorLambung.value = vehicle.nomorLambung || '';
-    warnaNomorLambung.value = vehicle.warnaNomorLambung || '';
-    nomorPolisi.value = vehicle.nomorPolisi || '';
-    tipe.value = vehicle.tipe || '';
-    merek.value = vehicle.merek || '';
-    user.value = vehicle.user || '';
-    perusahaan.value = vehicle.perusahaan || '';
-    tglSTNK.value = vehicle.tglSTNK || '';
-    tglPajak.value = vehicle.tglPajak || '';
-    kirKuer.value = vehicle.kirKuer || '';
-    noRangka.value = vehicle.noRangka || '';
-    noMesin.value = vehicle.noMesin || '';
-    localStorage.removeItem('currentVehicleData');
+    nomorPolisi.value = vehicle.nomorPolisi || "";
+    tipe.value = vehicle.tipe || "";
+    merek.value = vehicle.merek || "";
+    user.value = vehicle.user || "";
+    perusahaan.value = vehicle.perusahaan || "";
+    tglSTNK.value = vehicle.tglSTNK || "";
+    tglPajak.value = vehicle.tglPajak || "";
+    kirKuer.value = vehicle.kirKuer || "";
+    noRangka.value = vehicle.noRangka || "";
+    noMesin.value = vehicle.noMesin || "";
+    localStorage.removeItem("currentVehicleData");
   }
 });
 </script>
@@ -75,7 +73,7 @@ onMounted(() => {
           <div
             class="bg-white rounded-lg shadow-md p-1 pl-5 mb-2 -mt-1 shrink-0"
           >
-            <h1 class="text-base font-bold text-[#523E95] text-left">PT Indominco Mandiri</h1>
+            <h1 class="text-base font-bold text-[#523E95] text-left">Travel</h1>
           </div>
           <div
             class="bg-white rounded-lg shadow-md gap-4 p-5 flex-1 flex flex-col overflow-hidden"
@@ -91,7 +89,7 @@ onMounted(() => {
                   />
                 </button>
                 <h1 class="text-lg font-bold text-black">
-                  Detail Unit Kendaraan PT Indominco Mandiri
+                  Detail Unit Kendaraan Travel
                 </h1>
               </div>
               <button
@@ -103,23 +101,13 @@ onMounted(() => {
             </div>
 
             <!-- Nomor Lambung, Warna, dan Polisi -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <p class="text-base font-regular text-gray-800 mb-1">Nomor Lambung</p>
+                <p class="text-base font-regular text-gray-800 mb-1">Tipe</p>
                 <input
-                  v-model="nomorLambung"
+                  v-model="tipe"
                   type="text"
-                  placeholder="P - 309"
-                  disabled
-                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <p class="text-base font-regular text-gray-800 mb-1">Warna Nomor Lambung</p>
-                <input
-                  v-model="warnaNomorLambung"
-                  type="text"
-                  placeholder="Kuning"
+                  placeholder="Light Vehicle"
                   disabled
                   class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
                 />
@@ -139,23 +127,9 @@ onMounted(() => {
             </div>
 
             <!-- Tipe, Merek, dan User -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <p class="text-base font-regular text-gray-800 mb-1">
-                  Tipe
-                </p>
-                <input
-                  v-model="tipe"
-                  type="text"
-                  placeholder="Light Vehicle"
-                  disabled
-                  class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
-                />
-              </div>
-              <div>
-                <p class="text-base font-regular text-gray-800 mb-1">
-                  Merek
-                </p>
+                <p class="text-base font-regular text-gray-800 mb-1">Merek</p>
                 <input
                   v-model="merek"
                   type="text"
@@ -165,9 +139,7 @@ onMounted(() => {
                 />
               </div>
               <div>
-                <p class="text-base font-regular text-gray-800 mb-1">
-                  User
-                </p>
+                <p class="text-base font-regular text-gray-800 mb-1">User</p>
                 <input
                   v-model="user"
                   type="text"
@@ -262,7 +234,6 @@ onMounted(() => {
               </div>
             </div>
 
-
             <!-- Status Kendaraan Aktif -->
             <div
               class="flex justify-between items-center bg-[#EEEEEE] p-3 rounded-md border border-[#C3C3C3] mt-2"
@@ -309,213 +280,183 @@ onMounted(() => {
               </div>
 
               <div class="grid grid-cols-2 gap-4">
+                
                 <div>
-                  <label class="block text-base font-medium text-black mb-2 mt-2"
-                    >Nomor Lambung</label
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Nomor Polisi</label
                   >
                   <div class="relative">
                     <input
-                      v-model="nomorLambung"
+                      v-model="nomorPolisi"
                       type="text"
-                      placeholder="P - 309"
-                      class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      placeholder="KT 1234 AB"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
                     />
                     <PencilSquareIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
                     />
                   </div>
                 </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Warna Nomor Lambung</label
-                >
-                <div class="relative">
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Tipe</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="tipe"
+                      type="text"
+                      placeholder="Light Vehicle"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                    />
+                    <PencilSquareIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Merek</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="merek"
+                      type="text"
+                      placeholder="Toyota Innova"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                    />
+                    <PencilSquareIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >User</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="user"
+                      type="text"
+                      placeholder="Nama User"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                    />
+                    <PencilSquareIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Perusahaan</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="perusahaan"
+                      type="text"
+                      placeholder="PT Indominco Mandiri"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                    />
+                    <PencilSquareIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Tanggal STNK</label
+                  >
                   <input
-                    v-model="warnaNomorLambung"
+                    v-model="tglSTNK"
                     type="text"
-                    placeholder="Kuning"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    placeholder="7 Februari 2026"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
                   />
                 </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Nomor Polisi</label
-                >
-                <div class="relative">
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Tanggal Pajak</label
+                  >
                   <input
-                    v-model="nomorPolisi"
+                    v-model="tglPajak"
                     type="text"
-                    placeholder="KT 1234 AB"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    placeholder="7 Maret 2026"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
                   />
                 </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Tipe</label
-                >
-                <div class="relative">
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >KIR / KUER</label
+                  >
                   <input
-                    v-model="tipe"
+                    v-model="kirKuer"
                     type="text"
-                    placeholder="Light Vehicle"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    placeholder="28 Desember 2028"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
                   />
                 </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Merek</label
-                >
-                <div class="relative">
-                  <input
-                    v-model="merek"
-                    type="text"
-                    placeholder="Toyota Innova"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
-                  />
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Nomor Rangka</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="noRangka"
+                      type="text"
+                      placeholder="MK2KSWPNUJJ000338"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                    />
+                    <PencilSquareIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >User</label
-                >
-                <div class="relative">
-                  <input
-                    v-model="user"
-                    type="text"
-                    placeholder="Nama User"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
-                  />
+                <div>
+                  <label
+                    class="block text-base font-medium text-gray-800 mb-2 mt-2"
+                    >Nomor Mesin</label
+                  >
+                  <div class="relative">
+                    <input
+                      v-model="noMesin"
+                      type="text"
+                      placeholder="4N15UCP7140"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                    />
+                    <PencilSquareIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Perusahaan</label
-                >
-                <div class="relative">
-                  <input
-                    v-model="perusahaan"
-                    type="text"
-                    placeholder="PT Indominco Mandiri"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Tanggal STNK</label
-                >
-                <input
-                  v-model="tglSTNK"
-                  type="text"
-                  placeholder="7 Februari 2026"
-                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                />
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Tanggal Pajak</label
-                >
-                <input
-                  v-model="tglPajak"
-                  type="text"
-                  placeholder="7 Maret 2026"
-                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                />
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >KIR / KUER</label
-                >
-                <input
-                  v-model="kirKuer"
-                  type="text"
-                  placeholder="28 Desember 2028"
-                  class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                />
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Nomor Rangka</label
-                >
-                <div class="relative">
-                  <input
-                    v-model="noRangka"
-                    type="text"
-                    placeholder="MK2KSWPNUJJ000338"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  class="block text-base font-medium text-gray-800 mb-2 mt-2"
-                  >Nomor Mesin</label
-                >
-                <div class="relative">
-                  <input
-                    v-model="noMesin"
-                    type="text"
-                    placeholder="4N15UCP7140"
-                    class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
-                  />
-                  <PencilSquareIcon
-                    class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
-                  />
-                </div>
-              </div>
 
-              <!-- Status Kendaraan Aktif -->
-              <div
-                class="flex justify-between items-center bg-gray-50 p-4 rounded-md border border-[#C3C3C3] mt-4 col-span-2"
-              >
-                <p class="text-base font-regular text-gray-800">
-                  Status Kendaraan Aktif
-                </p>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input
-                    v-model="isStatusAktif"
-                    type="checkbox"
-                    class="sr-only peer"
-                  />
-                  <div
-                    class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#A90CF8] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#A90CF8]"
-                  ></div>
-                </label>
-              </div>
+                <!-- Status Kendaraan Aktif -->
+                <div
+                  class="flex justify-between items-center bg-gray-50 p-4 rounded-md border border-[#C3C3C3] mt-4 col-span-2"
+                >
+                  <p class="text-base font-regular text-gray-800">
+                    Status Kendaraan Aktif
+                  </p>
+                  <label
+                    class="relative inline-flex items-center cursor-pointer"
+                  >
+                    <input
+                      v-model="isStatusAktif"
+                      type="checkbox"
+                      class="sr-only peer"
+                    />
+                    <div
+                      class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#A90CF8] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#A90CF8]"
+                    ></div>
+                  </label>
+                </div>
               </div>
 
               <div class="flex justify-end gap-3 mt-6">

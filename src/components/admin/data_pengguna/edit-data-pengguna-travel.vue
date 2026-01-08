@@ -34,7 +34,7 @@ const closeEditAkun = () => {
 };
 
 const goBack = () => {
-  router.push("/data-pengguna-pt");
+  router.push("/data-pengguna-travel");
 };
 
 // Load user data dari localStorage berdasarkan ID
@@ -68,7 +68,7 @@ onMounted(() => {
           <div
             class="bg-white rounded-lg shadow-md p-1 pl-5 mb-2 -mt-1 shrink-0"
           >
-            <h1 class="text-base font-bold text-[#523E95] text-left">PT Indominco Mandiri</h1>
+            <h1 class="text-base font-bold text-[#523E95] text-left">Travel</h1>
           </div>
           <div
             class="bg-white rounded-lg shadow-md gap-4 p-5 flex-1 flex flex-col overflow-hidden"
@@ -84,7 +84,7 @@ onMounted(() => {
                   />
                 </button>
                 <h1 class="text-lg font-bold text-black">
-                  Detail Data Pengguna PT Indominco Mandiri
+                  Detail Data Pengguna Travel
                 </h1>
               </div>
               <button
@@ -179,7 +179,7 @@ onMounted(() => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <p class="text-base font-regular text-gray-800 mb-1">
-                  Status
+                  Status karyawan
                 </p>
                 <input
                   v-model="adminStatusKaryawan"
@@ -238,7 +238,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Konten Edit akun -->
+          <!-- Konten Edit -->
           <div
             v-if="showEditAkun"
             class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"

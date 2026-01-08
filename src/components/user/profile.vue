@@ -10,6 +10,16 @@ import {
 
 const showEditAkun = ref(false);
 
+// Dummy data
+const userName = ref('Naufal Andrian');
+const userEmail = ref('naufal@indominco.com');
+const userNoTelepon = ref('081234567890');
+const userTanggalLahir = ref('1990-05-15');
+const userPerusahaan = ref('PT Indominco Mandiri');
+const userDepartemen = ref('IT Department');
+const userStatusKaryawan = ref('Karyawan');
+const userPosisiKerja = ref('Administrator');
+
 const openEditAkun = () => {
   showEditAkun.value = true;
 };
@@ -44,17 +54,21 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Nama</p>
             <input
+              v-model="userName"
               type="text"
               placeholder="Nama Lengkap"
-              class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              disabled
+              class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
             />
           </div>
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Email</p>
             <input
+              v-model="userEmail"
               type="text"
               placeholder="email@example.com"
-              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              disabled
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
             />
           </div>
         </div>
@@ -66,9 +80,11 @@ const closeEditAkun = () => {
               Nomor Telepon
             </p>
             <input
+              v-model="userNoTelepon"
               type="text"
               placeholder="081xxxxxxxx"
-              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              disabled
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
             />
           </div>
           <div>
@@ -76,43 +92,53 @@ const closeEditAkun = () => {
               Tanggal Lahir
             </p>
             <input
+              v-model="userTanggalLahir"
               type="text"
               placeholder="hh/bb/tttt"
-              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              disabled
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
             />
           </div>
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Perusahaan</p>
             <input
+              v-model="userPerusahaan"
               type="text"
               placeholder="Perusahaan"
-              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
+              disabled
+              class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
             />
           </div>
         </div>
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Departemen</p>
           <input
+            v-model="userDepartemen"
             type="text"
             placeholder="Departemen"
-            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
+            disabled
+            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed mb-1"
           />
         </div>
         <div>
-          <p class="text-base font-regular text-gray-800 mb-1">Status karyawan</p>
+          <p class="text-base font-regular text-gray-800 mb-1">Status</p>
           <input
+            v-model="userStatusKaryawan"
             type="text"
-            placeholder="Status karyawan"
-            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
+            placeholder="Status"
+            disabled
+            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed mb-1"
           />
         </div>
 
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Posisi kerja</p>
           <input
+            v-model="userPosisiKerja"
             type="text"
             placeholder="Posisi kerja"
-            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
+            disabled
+            class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed mb-1"
           />
         </div>
       </div>

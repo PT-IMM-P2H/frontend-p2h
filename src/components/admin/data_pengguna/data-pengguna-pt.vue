@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
 import {
@@ -18,6 +19,8 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 import {PencilIcon, CalendarIcon} from "@heroicons/vue/24/solid";
+
+const router = useRouter();
 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
@@ -67,19 +70,23 @@ const tableData = ref([
     id: 1,
     namaLengkap: "Budi Santoso",
     noHandphone: "081234567890",
+    email:"budi@gmail.com",
+    namaPerusahaan: "PT Indominco Mandiri",
     departemen: "Operasional",
     posisi: "Supervisor",
     status: "Karyawan",
-    namaPerusahaan: "PT Indominco Mandiri",
+    role: "User",
   },
   {
     id: 2,
     namaLengkap: "Siti Nurhaliza",
     noHandphone: "082345678901",
+    email:"siti@gmail.com",
+    namaPerusahaan: "PT Indominco Mandiri",
     departemen: "Transport",
     posisi: "Manager",
     status: "Karyawan",
-    namaPerusahaan: "PT Indominco Mandiri",
+    role: "User",
   },
 ]);
 
@@ -206,6 +213,17 @@ const sortByName = () => {
     );
   }
   currentPage.value = 1;
+};
+
+const editPengguna = (rowId) => {
+  const userData = tableData.value.find(row => row.id === rowId);
+  if (userData) {
+    localStorage.setItem('currentUserData', JSON.stringify(userData));
+  }
+  router.push({
+    name: 'EditDataPenggunaPT',
+    params: { id: rowId }
+  });
 };
 </script>
 
@@ -364,6 +382,16 @@ const sortByName = () => {
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
                       >
+                        Email
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Nama Perusahaan
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
                         Departemen
                       </th>
                       <th
@@ -375,11 +403,6 @@ const sortByName = () => {
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20"
                       >
                         Status
-                      </th>
-                      <th
-                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
-                      >
-                        Nama Perusahaan
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-16"
@@ -429,6 +452,16 @@ const sortByName = () => {
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
                       >
+                        {{ row.email }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
+                        {{ row.namaPerusahaan }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
                         {{ row.departemen }}
                       </td>
                       <td
@@ -442,14 +475,10 @@ const sortByName = () => {
                         {{ row.status }}
                       </td>
                       <td
-                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
-                      >
-                        {{ row.namaPerusahaan }}
-                      </td>
-                      <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-16"
                       >
                         <button
+                          @click="editPengguna(row.id)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon

@@ -18,6 +18,7 @@ const adminPerusahaan = ref('PT Indominco Mandiri');
 const adminDepartemen = ref('IT Department');
 const adminStatusKaryawan = ref('Permanent');
 const adminPosisiKerja = ref('System Administrator');
+const roleKerja = ref('Admin');
 
 const openEditAkun = () => {
   showEditAkun.value = true;
@@ -51,7 +52,7 @@ const closeEditAkun = () => {
             </div>
 
             <!-- Nama dan Email -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <p class="text-base font-regular text-gray-800 mb-1">Nama</p>
                 <input
@@ -75,7 +76,7 @@ const closeEditAkun = () => {
             </div>
 
             <!-- Nomor Telepon dan Tanggal Lahir -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <p class="text-base font-regular text-gray-800 mb-1">
                   Nomor Telepon
@@ -153,6 +154,20 @@ const closeEditAkun = () => {
                 v-model="adminPosisiKerja"
                 type="text"
                 placeholder="Posisi kerja"
+                disabled
+                class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
+              />
+            </div>
+
+            <!-- Role-->
+            <div>
+              <p class="text-base font-regular text-gray-800 mb-1">
+                Role
+              </p>
+              <input
+                v-model="roleKerja"
+                type="text"
+                placeholder="Role"
                 disabled
                 class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
               />

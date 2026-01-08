@@ -100,6 +100,8 @@ const routeToMenuMap = {
   '/data-monitor-travel': 'monitor-travel',
   '/data-pengguna-pt': 'users-imm',
   '/data-pengguna-travel': 'users-travel',
+  '/edit-data-pengguna-pt/:id': 'users-imm',
+  '/edit-data-pengguna-travel/:id': 'users-travel',
   '/kelola-pertanyaan': 'questions',
   '/data-perusahaan': 'masterdata-company',
   '/data-departemen': 'masterdata-department',
@@ -113,20 +115,29 @@ const routeToMenuMap = {
 // Function untuk update activeMenu berdasarkan current route
 const updateActiveMenuFromRoute = () => {
   const currentPath = route.path
-  const menuId = routeToMenuMap[currentPath]
+  let menuId = routeToMenuMap[currentPath]
+  
+  // Jika route tidak langsung match (misal karena parameter), cek pattern
+  if (!menuId) {
+    if (currentPath.match(/^\/edit-data-pengguna-pt\//)) {
+      menuId = 'users-imm'
+    } else if (currentPath.match(/^\/edit-data-pengguna-travel\//)) {
+      menuId = 'users-travel'
+    }
+  }
   
   if (menuId) {
     activeMenu.value = menuId
     
-    // Auto-expand parent menus jika diperlukan
     if (menuId.includes('-')) {
-      const parentId = menuId.split('-')[0]
+      const parts = menuId.split('-')
+      const parentId = parts[0] // 'users', 'monitor', 'masterdata', dll
       expandedMenu.value.add(parentId)
       
-      // Untuk nested items (vehicle-imm, vehicle-travel)
-      if (menuId.includes('vehicle')) {
-        expandedMenu.value.add('masterdata')
-        expandedMenu.value.add('masterdata-vehicle')
+      // Untuk nested items yang lebih dalam (masterdata-vehicle-imm, masterdata-vehicle-travel)
+      if (parts.length > 2) {
+        const parentParentId = parts.slice(0, 2).join('-') // 'masterdata-vehicle'
+        expandedMenu.value.add(parentParentId)
       }
     }
   }

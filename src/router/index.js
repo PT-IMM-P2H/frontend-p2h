@@ -56,9 +56,19 @@ const router = createRouter({
             component: () => import('../components/admin/data_pengguna/data-pengguna-pt.vue')
         },
         {
+            path: '/edit-data-pengguna-pt/:id',
+            name: 'EditDataPenggunaPT',
+            component: () => import('../components/admin/data_pengguna/edit-data-pengguna-pt.vue')
+        },
+        {
             path: '/data-pengguna-travel',
             name: 'data-pengguna-travel',
             component: () => import('../components/admin/data_pengguna/data-pengguna-travel.vue')
+        },
+        {
+            path: '/edit-data-pengguna-travel/:id',
+            name: 'EditDataPenggunaTravel',
+            component: () => import('../components/admin/data_pengguna/edit-data-pengguna-travel.vue')
         },
         {
             path: '/kelola-pertanyaan',

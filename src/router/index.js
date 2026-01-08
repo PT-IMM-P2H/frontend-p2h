@@ -5,6 +5,7 @@ import LoginPage from '../components/login-page.vue'
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
+        // USER ROUTES
         {
             path: '/login',
             name: 'login',
@@ -35,6 +36,13 @@ const router = createRouter({
             name: 'riwayat-user',
             component: () => import('../components/user/riwayat-user.vue')
         },
+        {
+            path: '/hasil-form',
+            name: 'hasil-form',
+            component: () => import('../components/user/hasil_form.vue')
+        },
+
+        // ADMIN ROUTES
         {
             path: '/dashboard',
             name: 'dashboard',

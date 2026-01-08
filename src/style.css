@@ -143,3 +143,8 @@ input[type="datetime-local"]::-webkit-clear-button {
     background-color: #f9f9f9;
   }
 }
+
+/* Ensure italic styling works */
+.italic {
+  font-style: oblique 10deg !important;
+}

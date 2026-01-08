@@ -32,6 +32,11 @@ const hadlemonitor= () => {
   isMenuOpen.value = false;
 };
 
+const hadlehasilP2H = () => {
+  router.push({ name: "hasil-form" });
+  isMenuOpen.value = false;
+};
+
 const currentRoute = computed(() => router.currentRoute.value.name);
 
 const getButtonClass = (routeName) => {
@@ -90,6 +95,14 @@ const closeMenu = () => {
         class="text-xs lg:text-sm hover:opacity-70 transition-all duration-200 whitespace-nowrap"
       >
         Form P2H
+      </button>
+      <button
+        @click="hadlehasilP2H"
+        :class="getButtonClass('hasil-form')"
+        :style="{ color: getButtonColor('hasil-form') }"
+        class="text-xs lg:text-sm hover:opacity-70 transition-all duration-200 whitespace-nowrap"
+      >
+        Hasil P2H
       </button>
       <button
         @click="hadlepriwayat"
@@ -163,6 +176,14 @@ const closeMenu = () => {
           class="block w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-gray-50 transition-colors duration-200"
         >
           Form P2H
+        </button>
+        <button
+          @click="hadlehasilP2H"
+          :class="getButtonClass('hasil-form')"
+          :style="{ color: getButtonColor('hasil-form') }"
+          class="block w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-gray-50 transition-colors duration-200"
+        >
+          Hasil P2H
         </button>
         <button
           @click="hadlepriwayat"

@@ -31,19 +31,13 @@ const closeTambahPosisi = () => {
 };
 
 const showEditPosisi = ref(false);
-const editPosisiData = ref({
-  id: null,
-  namaPosisi: "",
-});
 
-const openEditPosisi = (row) => {
-  editPosisiData.value = { ...row };
+const openEditPosisi = () => {
   showEditPosisi.value = true;
 };
 
 const closeEditPosisi = () => {
   showEditPosisi.value = false;
-  editPosisiData.value = { id: null, namaPosisi: "" };
 };
 
 const tableData = ref([
@@ -312,7 +306,7 @@ const nextPage = () => {
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap flex-1 text-right"
                       >
                         <button
-                          @click="openEditPosisi(row)"
+                          @click="openEditPosisi"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon class="w-4.5 h-4.5 text-black hover:text-blue-800" />
@@ -440,7 +434,6 @@ const nextPage = () => {
                   >
                   <div class="relative">
                     <input
-                      v-model="editPosisiData.namaPosisi"
                       type="text"
                       placeholder="Masukkan nama"
                       class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"

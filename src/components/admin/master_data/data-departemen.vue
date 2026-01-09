@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, reactive } from "vue";
+import api from "@/services/api"; // Import API Service
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
 import {
@@ -14,15 +15,119 @@ import {
 } from "@heroicons/vue/24/outline";
 import { PencilIcon } from "@heroicons/vue/24/solid";
 
+// --- STATE ---
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 10;
 const showTambahDepartemen = ref(false);
+const showEditDepartemen = ref(false);
 const sortOrder = ref("asc");
+const loading = ref(false); // Indikator loading
+
+// State untuk Form Input (Create & Update)
+const formData = reactive({
+  id: null,
+  nama: "",
+});
+
+// Data Utama (Nanti diisi dari API)
+const tableData = ref([]);
+
+// --- API ACTIONS ---
+
+// 1. Fetch Data dari Backend
+const fetchData = async () => {
+  loading.value = true;
+  try {
+    const response = await api.master.getDepartments();
+    if (response.data.status === "success") {
+      // Mapping response backend (nama_department) ke structure frontend (namaDepartemen)
+      // Agar logic filtering & sorting yang sudah ada TIDAK RUSAK
+      tableData.value = response.data.payload.map((item) => ({
+        id: item.id,
+        namaDepartemen: item.nama_department, 
+      }));
+    }
+  } catch (error) {
+    console.error("Gagal mengambil data:", error);
+    alert("Gagal memuat data departemen");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 2. Tambah Departemen
+const submitTambah = async () => {
+  if (!formData.nama.trim()) return alert("Nama departemen tidak boleh kosong");
+  
+  loading.value = true;
+  try {
+    const response = await api.master.createDepartment({
+      nama_department: formData.nama,
+    });
+    
+    if (response.data.status === "success") {
+      alert("Departemen berhasil ditambahkan");
+      closeTambahDepartemen();
+      fetchData(); // Refresh data
+    }
+  } catch (error) {
+    alert(error.response?.data?.detail || "Gagal menambah departemen");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 3. Update Departemen
+const submitEdit = async () => {
+  if (!formData.nama.trim()) return alert("Nama departemen tidak boleh kosong");
+
+  loading.value = true;
+  try {
+    const response = await api.master.updateDepartment(formData.id, {
+      nama_department: formData.nama,
+    });
+
+    if (response.data.status === "success") {
+      alert("Departemen berhasil diperbarui");
+      closeEditDepartemen();
+      fetchData(); // Refresh data
+    }
+  } catch (error) {
+    alert(error.response?.data?.detail || "Gagal mengupdate departemen");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 4. Hapus Departemen (Bulk Delete)
+const handleDeleteSelected = async () => {
+  if (selectedRowIds.value.length === 0) return;
+  if (!confirm(`Hapus ${selectedRowIds.value.length} departemen terpilih?`)) return;
+
+  loading.value = true;
+  try {
+    // Loop delete request (karena API delete per ID)
+    for (const id of selectedRowIds.value) {
+      await api.master.deleteDepartment(id);
+    }
+    alert("Data terpilih berhasil dihapus");
+    selectedRowIds.value = []; // Reset selection
+    selectAllChecked.value = false;
+    fetchData(); // Refresh data
+  } catch (error) {
+    alert("Terjadi kesalahan saat menghapus data");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// --- MODAL CONTROLLERS ---
 
 const openTambahDepartemen = () => {
+  formData.nama = ""; // Reset form
   showTambahDepartemen.value = true;
 };
 
@@ -30,9 +135,10 @@ const closeTambahDepartemen = () => {
   showTambahDepartemen.value = false;
 };
 
-const showEditDepartemen = ref(false);
-
-const openEditDepartemen = () => {
+// Modified: Menerima parameter row untuk mengisi form edit
+const openEditDepartemen = (row) => {
+  formData.id = row.id;
+  formData.nama = row.namaDepartemen;
   showEditDepartemen.value = true;
 };
 
@@ -40,42 +146,24 @@ const closeEditDepartemen = () => {
   showEditDepartemen.value = false;
 };
 
-const tableData = ref([
-  {
-    id: 1,
-    namaDepartemen: "Asset & Inventory Management",
-  },
-  {
-    id: 2,
-    namaDepartemen: "Comunity Development",
-  },
-  {
-    id: 3,
-    namaDepartemen: "Coal Handling & Processing",
-  },
-]);
+// --- TABLE LOGIC (Existing Logic Preserved) ---
 
 const selectRow = (rowId) => {
   const index = selectedRowIds.value.indexOf(rowId);
   if (index > -1) {
-    // Hapus ID jika sudah ada
     selectedRowIds.value.splice(index, 1);
   } else {
-    // Tambah ID jika belum ada
     selectedRowIds.value.push(rowId);
   }
-  // Update selectAllChecked
   selectAllChecked.value =
-    selectedRowIds.value.length === tableData.value.length;
+    selectedRowIds.value.length === tableData.value.length && tableData.value.length > 0;
 };
 
 const toggleSelectAll = () => {
   selectAllChecked.value = !selectAllChecked.value;
   if (selectAllChecked.value) {
-    // Pilih semua
     selectedRowIds.value = tableData.value.map((row) => row.id);
   } else {
-    // Kosongkan semua
     selectedRowIds.value = [];
   }
 };
@@ -84,24 +172,20 @@ const isRowSelected = (rowId) => {
   return selectedRowIds.value.includes(rowId);
 };
 
-// Helper function untuk normalize string (hapus whitespace dan karakter khusus)
 const normalizeString = (str) => {
-  return str.toLowerCase().replace(/[\s\-./]/g, "");
+  return str ? str.toLowerCase().replace(/[\s\-./]/g, "") : "";
 };
 
-// Filter data berdasarkan search query
 const filteredTableData = computed(() => {
   if (!searchQuery.value.trim()) {
     return tableData.value;
   }
-
   const query = normalizeString(searchQuery.value);
   return tableData.value.filter((row) => {
     return normalizeString(row.namaDepartemen).includes(query);
   });
 });
 
-// Pagination computed
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
@@ -129,22 +213,31 @@ const previousPage = () => {
   }
 };
 
-const sortByDepartmentName = () => {
-  if (sortOrder.value === "asc") {
-    sortOrder.value = "desc";
-    tableData.value = [...tableData.value].sort((a, b) => b.namaDepartemen.localeCompare(a.namaDepartemen));
-  } else {
-    sortOrder.value = "asc";
-    tableData.value = [...tableData.value].sort((a, b) => a.namaDepartemen.localeCompare(b.namaDepartemen));
-  }
-  currentPage.value = 1;
-};
-
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
   }
 };
+
+const sortByDepartmentName = () => {
+  if (sortOrder.value === "asc") {
+    sortOrder.value = "desc";
+    tableData.value = [...tableData.value].sort((a, b) =>
+      b.namaDepartemen.localeCompare(a.namaDepartemen)
+    );
+  } else {
+    sortOrder.value = "asc";
+    tableData.value = [...tableData.value].sort((a, b) =>
+      a.namaDepartemen.localeCompare(b.namaDepartemen)
+    );
+  }
+  currentPage.value = 1;
+};
+
+// Lifecycle
+onMounted(() => {
+  fetchData();
+});
 </script>
 
 <template>
@@ -155,20 +248,16 @@ const nextPage = () => {
       <div class="flex flex-col flex-1 overflow-hidden">
         <HeaderAdmin />
 
-        <!-- Content -->
         <main class="bg-[#EFEFEF] flex-1 flex flex-col p-3 overflow-hidden">
           <div
             class="bg-white rounded-lg shadow-md p-5 flex-1 flex flex-col overflow-hidden"
           >
-            <!-- Toolbar -->
             <div
               class="flex items-center gap-3 pb-4 border-b shrink-0 flex-none justify-between"
             >
-              <!-- Left Section -->
               <div class="flex items-center gap-3">
-                <!-- Tambah departemen Button -->
                 <button
-                  @click="openTambahdepartemen"
+                  @click="openTambahDepartemen"
                   class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-white bg-[#6444C6] hover:bg-[#5c3db8] transition text-sm"
                 >
                   <PlusIcon class="w-5 h-5" />
@@ -190,8 +279,8 @@ const nextPage = () => {
                   />
                 </div>
 
-                <!-- Delete Button -->
                 <button
+                  @click="handleDeleteSelected"
                   :disabled="selectedRowIds.length === 0"
                   class="flex items-center gap-2 px-3 py-2 rounded-md transition text-sm"
                   :class="
@@ -206,13 +295,17 @@ const nextPage = () => {
               </div>
             </div>
 
-            <!-- Table Container with Horizontal Scroll -->
             <div
-              class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden">
+              class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden"
+            >
               <div
                 class="overflow-x-auto overflow-y-auto rounded-lg border bg-white max-h-105"
               >
-                <table class="w-full border-collapse">
+                <div v-if="loading" class="p-4 text-center text-gray-500">
+                  Memuat data...
+                </div>
+
+                <table v-else class="w-full border-collapse">
                   <thead>
                     <tr class="border-b-2 border-gray-400 bg-gray-50">
                       <th
@@ -223,17 +316,13 @@ const nextPage = () => {
                             type="checkbox"
                             :checked="selectAllChecked"
                             @change="toggleSelectAll"
-                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none
-                                  bg-white border-gray-600
-                                  checked:bg-blue-500 checked:border-blue-500"
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
                             style="
                               appearance: none;
                               -webkit-appearance: none;
                               -moz-appearance: none;
                             "
-                            title="Pilih semua / Batal pilih semua"
                           />
-                          <!-- Check Icon -->
                           <CheckIcon
                             v-if="selectAllChecked"
                             class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
@@ -251,7 +340,10 @@ const nextPage = () => {
                       >
                         <div class="flex items-center gap-2">
                           <span>Nama Departemen</span>
-                          <ArrowDownIcon v-if="sortOrder === 'asc'" class="w-4 h-4" />
+                          <ArrowDownIcon
+                            v-if="sortOrder === 'asc'"
+                            class="w-4 h-4"
+                          />
                           <ArrowUpIcon v-else class="w-4 h-4" />
                         </div>
                       </th>
@@ -264,7 +356,7 @@ const nextPage = () => {
                   </thead>
                   <tbody>
                     <tr
-                      v-for="row in paginatedData"
+                      v-for="(row, index) in paginatedData"
                       :key="row.id"
                       class="border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer"
                       :class="{ 'bg-blue-50': isRowSelected(row.id) }"
@@ -276,16 +368,13 @@ const nextPage = () => {
                             :checked="isRowSelected(row.id)"
                             @change="selectRow(row.id)"
                             @click.stop
-                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none
-                                  bg-white border-gray-600
-                                  checked:bg-blue-500 checked:border-blue-500"
+                            class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
                             style="
                               appearance: none;
                               -webkit-appearance: none;
                               -moz-appearance: none;
                             "
                           />
-                          <!-- Check Icon -->
                           <CheckIcon
                             v-if="isRowSelected(row.id)"
                             class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
@@ -295,7 +384,7 @@ const nextPage = () => {
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap w-20"
                       >
-                        {{ tableData.indexOf(row) + 1 }}
+                        {{ (currentPage - 1) * itemsPerPage + index + 1 }}
                       </td>
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap w-48"
@@ -306,25 +395,35 @@ const nextPage = () => {
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap flex-1 text-right"
                       >
                         <button
-                          @click="openEditDepartemen"
+                          @click="openEditDepartemen(row)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
-                          <PencilSquareIcon class="w-4.5 h-4.5 text-black hover:text-blue-800" />
+                          <PencilSquareIcon
+                            class="w-4.5 h-4.5 text-black hover:text-blue-800"
+                          />
                         </button>
+                      </td>
+                    </tr>
+                    <tr v-if="paginatedData.length === 0 && !loading">
+                      <td
+                        colspan="4"
+                        class="p-4 text-center text-sm text-gray-500"
+                      >
+                        Tidak ada data ditemukan.
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <!-- Pagination -->
               <div
                 class="flex flex-col md:flex-row justify-between md:justify-end items-center gap-3 md:gap-4 pt-3 md:pt-4 border-t border-gray-200"
               >
                 <span
                   class="text-xs md:text-sm text-gray-700 font-medium order-2 md:order-1"
                 >
-                  {{ startIndex }} - {{ endIndex }} of
+                  {{ filteredTableData.length ? startIndex : 0 }} -
+                  {{ endIndex }} of
                   {{ filteredTableData.length }}
                 </span>
                 <div class="flex gap-2 order-1 md:order-2">
@@ -337,7 +436,7 @@ const nextPage = () => {
                   </button>
                   <button
                     @click="nextPage"
-                    :disabled="currentPage === totalPages"
+                    :disabled="currentPage === totalPages || totalPages === 0"
                     class="px-2 md:px-3 py-1 md:py-2 border border-gray-300 rounded-md text-gray-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition"
                   >
                     &gt;
@@ -346,7 +445,6 @@ const nextPage = () => {
               </div>
             </div>
 
-            <!-- Konten Tambah Departemen -->
             <div
               v-if="showTambahDepartemen"
               class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
@@ -377,6 +475,7 @@ const nextPage = () => {
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.nama"
                       type="text"
                       placeholder="Nama departemen"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
@@ -389,9 +488,11 @@ const nextPage = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="submitTambah"
+                    :disabled="loading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50"
                   >
-                    Tambah Departemen
+                    {{ loading ? "Menyimpan..." : "Tambah Departemen" }}
                   </button>
                   <button
                     @click="closeTambahDepartemen"
@@ -403,7 +504,6 @@ const nextPage = () => {
               </div>
             </div>
 
-            <!-- Edit Departemen -->
             <div
               v-if="showEditDepartemen"
               class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
@@ -434,6 +534,7 @@ const nextPage = () => {
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.nama"
                       type="text"
                       placeholder="Nama departemen"
                       class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
@@ -446,9 +547,11 @@ const nextPage = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="submitEdit"
+                    :disabled="loading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50"
                   >
-                    Edit Departemen
+                    {{ loading ? "Menyimpan..." : "Edit Departemen" }}
                   </button>
                   <button
                     @click="closeEditDepartemen"

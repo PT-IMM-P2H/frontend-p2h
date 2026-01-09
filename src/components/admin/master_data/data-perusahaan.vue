@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
 import {
@@ -13,6 +13,7 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 import { PencilIcon } from "@heroicons/vue/24/solid";
+import apiService from "@/services/api";
 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
@@ -21,47 +22,209 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const showTambahPerusahaan = ref(false);
 const sortOrder = ref("asc");
+const isLoading = ref(false);
+const errorMessage = ref("");
+
+// Form data untuk tambah/edit
+const formData = ref({
+  nama_perusahaan: "",
+  status: "",
+});
+
+const editingId = ref(null);
 
 const openTambahPerusahaan = () => {
+  formData.value = {
+    nama_perusahaan: "",
+    status: "",
+  };
+  editingId.value = null;
   showTambahPerusahaan.value = true;
 };
 
 const closeTambahPerusahaan = () => {
   showTambahPerusahaan.value = false;
+  formData.value = {
+    nama_perusahaan: "",
+    status: "",
+  };
+  errorMessage.value = "";
 };
 
 const showEditPerusahaan = ref(false);
 
-const openEditPerusahaan = () => {
+const openEditPerusahaan = (company) => {
+  formData.value = {
+    nama_perusahaan: company.nama_perusahaan,
+    status: company.status || "",
+  };
+  editingId.value = company.id;
   showEditPerusahaan.value = true;
 };
 
 const closeEditPerusahaan = () => {
   showEditPerusahaan.value = false;
+  formData.value = {
+    nama_perusahaan: "",
+    status: "",
+  };
+  editingId.value = null;
+  errorMessage.value = "";
 };
 
-const tableData = ref([
-  {
-    id: 1,
-    namaPerusahaan: "PT Indominco Mandiri",
-    status: "User",
-  },
-  {
-    id: 2,
-    namaPerusahaan: "PT Bara Usaha Mandiri",
-    status: "Driver",
-  },
-  {
-    id: 3,
-    namaPerusahaan: "PT Gelora Lintas Maharitas",
-    status: "Driver",
-  },
-  {
-    id: 4,
-    namaPerusahaan: "PT Sabda Tunggal",
-    status: "Driver Truk Sampah",
-  },
-]);
+const tableData = ref([]);
+
+// Fetch data dari backend
+const fetchCompanies = async () => {
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    const response = await apiService.master.getCompanies();
+    
+    if (response.data.status === 'success' || response.data.success) {
+      tableData.value = response.data.payload.map(company => ({
+        id: company.id,
+        namaPerusahaan: company.nama_perusahaan,
+        status: company.status || "-",
+      }));
+    } else {
+      errorMessage.value = response.data.message || "Gagal mengambil data";
+    }
+  } catch (error) {
+    console.error("Error fetching companies:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal mengambil data perusahaan";
+    
+    errorMessage.value = errorMsg;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Tambah perusahaan baru
+const handleTambahPerusahaan = async () => {
+  if (!formData.value.nama_perusahaan.trim()) {
+    errorMessage.value = "Nama perusahaan wajib diisi";
+    alert("Nama perusahaan wajib diisi!");
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  
+  try {
+    const payload = {
+      nama_perusahaan: formData.value.nama_perusahaan,
+      status: formData.value.status || null,
+    };
+    
+    const response = await apiService.master.createCompany(payload);
+    
+    if (response.data.status === 'success' || response.data.success) {
+      alert("Perusahaan berhasil ditambahkan");
+      closeTambahPerusahaan();
+      await fetchCompanies();
+    } else {
+      errorMessage.value = response.data.message || "Gagal menambahkan perusahaan";
+    }
+  } catch (error) {
+    console.error("Error creating company:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal menambahkan perusahaan";
+    
+    errorMessage.value = errorMsg;
+    alert(`Error: ${errorMsg}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Update perusahaan
+const handleEditPerusahaan = async () => {
+  if (!formData.value.nama_perusahaan.trim()) {
+    errorMessage.value = "Nama perusahaan wajib diisi";
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    const response = await apiService.master.updateCompany(editingId.value, {
+      nama_perusahaan: formData.value.nama_perusahaan,
+      status: formData.value.status || null,
+    });
+    
+    if (response.data.status === 'success' || response.data.success) {
+      await fetchCompanies();
+      closeEditPerusahaan();
+      alert("Perusahaan berhasil diupdate");
+    }
+  } catch (error) {
+    console.error("Error updating company:", error);
+    errorMessage.value = error.response?.data?.detail || "Gagal mengupdate perusahaan";
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Hapus perusahaan (soft delete)
+const handleDeleteCompanies = async () => {
+  if (selectedRowIds.value.length === 0) {
+    alert("Pilih perusahaan yang ingin dihapus!");
+    return;
+  }
+  
+  if (!confirm(`Yakin ingin menghapus ${selectedRowIds.value.length} perusahaan?`)) {
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  let deletedCount = 0;
+  
+  try {
+    // Hapus satu per satu
+    for (const id of selectedRowIds.value) {
+      await apiService.master.deleteCompany(id);
+      deletedCount++;
+    }
+    
+    // Reset selection
+    selectedRowIds.value = [];
+    selectAllChecked.value = false;
+    
+    // Clear current data to force refresh
+    tableData.value = [];
+    
+    // Refresh data from backend
+    await fetchCompanies();
+    
+    alert(`${deletedCount} perusahaan berhasil dihapus`);
+  } catch (error) {
+    console.error("Error deleting companies:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal menghapus perusahaan";
+    
+    errorMessage.value = errorMsg;
+    alert(`Error: ${errorMsg}\n\nBerhasil dihapus: ${deletedCount} dari ${selectedRowIds.value.length}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Load data saat component di-mount
+onMounted(() => {
+  fetchCompanies();
+});
 
 const selectRow = (rowId) => {
   const index = selectedRowIds.value.indexOf(rowId);
@@ -200,16 +363,17 @@ const nextPage = () => {
 
                 <!-- Delete Button -->
                 <button
-                  :disabled="selectedRowIds.length === 0"
+                  @click="handleDeleteCompanies"
+                  :disabled="selectedRowIds.length === 0 || isLoading"
                   class="flex items-center gap-2 px-3 py-2 rounded-md transition text-sm"
                   :class="
-                    selectedRowIds.length > 0
+                    selectedRowIds.length > 0 && !isLoading
                       ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
                       : 'bg-gray-100 text-gray-400 border border-gray-300 cursor-not-allowed'
                   "
                 >
                   <TrashIcon class="w-4 h-4" />
-                  <span>Hapus</span>
+                  <span>{{ isLoading ? 'Loading...' : 'Hapus' }}</span>
                 </button>
               </div>
             </div>
@@ -217,7 +381,27 @@ const nextPage = () => {
             <!-- Table Container with Horizontal Scroll -->
             <div
               class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden">
-              <div
+              
+              <!-- Loading & Error Messages -->
+              <div v-if="isLoading" class="text-center py-8 text-gray-600">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2">Memuat data...</p>
+              </div>
+              
+              <div v-else-if="errorMessage" class="text-center py-8">
+                <p class="text-red-600">{{ errorMessage }}</p>
+                <button @click="fetchCompanies" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  Coba Lagi
+                </button>
+              </div>
+              
+              <div v-else-if="tableData.length === 0" class="text-center py-8 text-gray-600">
+                <p>Belum ada data perusahaan</p>
+              </div>
+              
+              <div v-else
                 class="overflow-x-auto overflow-y-auto rounded-lg border bg-white max-h-105"
               >
                 <table class="w-full border-collapse">
@@ -324,7 +508,7 @@ const nextPage = () => {
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap flex-1 text-right"
                       >
                         <button
-                          @click="openEditPerusahaan"
+                          @click="openEditPerusahaan(row)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon class="w-4.5 h-4.5 text-black hover:text-blue-800" />
@@ -388,16 +572,23 @@ const nextPage = () => {
                   </button>
                 </div>
 
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p class="text-sm text-red-600">{{ errorMessage }}</p>
+                </div>
+
                 <div>
                   <label
                     class="block text-base font-medium text-black mb-2 mt-4"
-                    >Nama Perusahaan</label
+                    >Nama Perusahaan <span class="text-red-500">*</span></label
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.nama_perusahaan"
                       type="text"
                       placeholder="Masukkan nama"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      :disabled="isLoading"
                     />
                     <PencilIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -411,9 +602,11 @@ const nextPage = () => {
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.status"
                       type="text"
-                      placeholder="Pilih status"
+                      placeholder="Pilih status (opsional)"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      :disabled="isLoading"
                     />
                     <PencilIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -423,13 +616,16 @@ const nextPage = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="handleTambahPerusahaan"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Tambah Perusahaan
+                    {{ isLoading ? 'Menyimpan...' : 'Tambah Perusahaan' }}
                   </button>
                   <button
                     @click="closeTambahPerusahaan"
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Batal
                   </button>
@@ -461,16 +657,23 @@ const nextPage = () => {
                   </button>
                 </div>
 
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p class="text-sm text-red-600">{{ errorMessage }}</p>
+                </div>
+
                 <div>
                   <label
                     class="block text-base font-medium text-black mb-2 mt-4"
-                    >Nama Perusahaan</label
+                    >Nama Perusahaan <span class="text-red-500">*</span></label
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.nama_perusahaan"
                       type="text"
                       placeholder="Masukkan nama"
                       class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      :disabled="isLoading"
                     />
                     <PencilSquareIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -484,9 +687,11 @@ const nextPage = () => {
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.status"
                       type="text"
-                      placeholder="Pilih status"
+                      placeholder="Pilih status (opsional)"
                       class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      :disabled="isLoading"
                     />
                     <PencilSquareIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -496,13 +701,16 @@ const nextPage = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="handleEditPerusahaan"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Edit Perusahaan
+                    {{ isLoading ? 'Menyimpan...' : 'Edit Perusahaan' }}
                   </button>
                   <button
                     @click="closeEditPerusahaan"
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Batal
                   </button>

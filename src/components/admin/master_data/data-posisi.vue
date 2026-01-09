@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
 import {
@@ -13,6 +13,7 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 import { PencilIcon } from "@heroicons/vue/24/solid";
+import apiService from "@/services/api";
 
 const selectedRowIds = ref([]);
 const selectAllChecked = ref(false);
@@ -21,39 +22,201 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const showTambahPosisi = ref(false);
 const sortOrder = ref("asc");
+const isLoading = ref(false);
+const errorMessage = ref("");
+
+// Form data untuk tambah/edit
+const formData = ref({
+  nama_posisi: "",
+});
+
+const editingId = ref(null);
 
 const openTambahPosisi = () => {
+  formData.value = {
+    nama_posisi: "",
+  };
+  editingId.value = null;
   showTambahPosisi.value = true;
 };
 
 const closeTambahPosisi = () => {
   showTambahPosisi.value = false;
+  formData.value = {
+    nama_posisi: "",
+  };
+  errorMessage.value = "";
 };
 
 const showEditPosisi = ref(false);
 
-const openEditPosisi = () => {
+const openEditPosisi = (position) => {
+  formData.value = {
+    nama_posisi: position.namaPosisi,
+  };
+  editingId.value = position.id;
   showEditPosisi.value = true;
 };
 
 const closeEditPosisi = () => {
   showEditPosisi.value = false;
+  formData.value = {
+    nama_posisi: "",
+  };
+  editingId.value = null;
+  errorMessage.value = "";
 };
 
-const tableData = ref([
-  {
-    id: 1,
-    namaPosisi: "Assistant Vice President",
-  },
-  {
-    id: 2,
-    namaPosisi: "Departement Head",
-  },
-  {
-    id: 3,
-    namaPosisi: "Direktur",
-  },
-]);
+const tableData = ref([]);
+
+// Fetch data dari backend
+const fetchPositions = async () => {
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    const response = await apiService.master.getPositions();
+    
+    if (response.data.status === 'success' || response.data.success) {
+      tableData.value = response.data.payload.map(position => ({
+        id: position.id,
+        namaPosisi: position.nama_posisi,
+      }));
+    } else {
+      errorMessage.value = response.data.message || "Gagal mengambil data";
+    }
+  } catch (error) {
+    console.error("Error fetching positions:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal mengambil data posisi";
+    
+    errorMessage.value = errorMsg;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Tambah posisi baru
+const handleTambahPosisi = async () => {
+  if (!formData.value.nama_posisi.trim()) {
+    errorMessage.value = "Nama posisi wajib diisi";
+    alert("Nama posisi wajib diisi!");
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  
+  try {
+    const payload = {
+      nama_posisi: formData.value.nama_posisi,
+    };
+    
+    const response = await apiService.master.createPosition(payload);
+    
+    if (response.data.status === 'success' || response.data.success) {
+      alert("Posisi berhasil ditambahkan");
+      closeTambahPosisi();
+      await fetchPositions();
+    } else {
+      errorMessage.value = response.data.message || "Gagal menambahkan posisi";
+    }
+  } catch (error) {
+    console.error("Error creating position:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal menambahkan posisi";
+    
+    errorMessage.value = errorMsg;
+    alert(`Error: ${errorMsg}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Update posisi
+const handleEditPosisi = async () => {
+  if (!formData.value.nama_posisi.trim()) {
+    errorMessage.value = "Nama posisi wajib diisi";
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    const response = await apiService.master.updatePosition(editingId.value, {
+      nama_posisi: formData.value.nama_posisi,
+    });
+    
+    if (response.data.status === 'success' || response.data.success) {
+      await fetchPositions();
+      closeEditPosisi();
+      alert("Posisi berhasil diupdate");
+    }
+  } catch (error) {
+    console.error("Error updating position:", error);
+    errorMessage.value = error.response?.data?.detail || "Gagal mengupdate posisi";
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Hapus posisi (soft delete)
+const handleDeletePositions = async () => {
+  if (selectedRowIds.value.length === 0) {
+    alert("Pilih posisi yang ingin dihapus!");
+    return;
+  }
+  
+  if (!confirm(`Yakin ingin menghapus ${selectedRowIds.value.length} posisi?`)) {
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  let deletedCount = 0;
+  
+  try {
+    // Hapus satu per satu
+    for (const id of selectedRowIds.value) {
+      await apiService.master.deletePosition(id);
+      deletedCount++;
+    }
+    
+    // Reset selection
+    selectedRowIds.value = [];
+    selectAllChecked.value = false;
+    
+    // Clear current data to force refresh
+    tableData.value = [];
+    
+    // Refresh data from backend
+    await fetchPositions();
+    
+    alert(`${deletedCount} posisi berhasil dihapus`);
+  } catch (error) {
+    console.error("Error deleting positions:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal menghapus posisi";
+    
+    errorMessage.value = errorMsg;
+    alert(`Error: ${errorMsg}\n\nBerhasil dihapus: ${deletedCount} dari ${selectedRowIds.value.length}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Load data saat component di-mount
+onMounted(() => {
+  fetchPositions();
+});
 
 const selectRow = (rowId) => {
   const index = selectedRowIds.value.indexOf(rowId);
@@ -192,16 +355,17 @@ const nextPage = () => {
 
                 <!-- Delete Button -->
                 <button
-                  :disabled="selectedRowIds.length === 0"
+                  @click="handleDeletePositions"
+                  :disabled="selectedRowIds.length === 0 || isLoading"
                   class="flex items-center gap-2 px-3 py-2 rounded-md transition text-sm"
                   :class="
-                    selectedRowIds.length > 0
+                    selectedRowIds.length > 0 && !isLoading
                       ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
                       : 'bg-gray-100 text-gray-400 border border-gray-300 cursor-not-allowed'
                   "
                 >
                   <TrashIcon class="w-4 h-4" />
-                  <span>Hapus</span>
+                  <span>{{ isLoading ? 'Loading...' : 'Hapus' }}</span>
                 </button>
               </div>
             </div>
@@ -209,7 +373,27 @@ const nextPage = () => {
             <!-- Table Container with Horizontal Scroll -->
             <div
               class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden">
-              <div
+              
+              <!-- Loading & Error Messages -->
+              <div v-if="isLoading" class="text-center py-8 text-gray-600">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2">Memuat data...</p>
+              </div>
+              
+              <div v-else-if="errorMessage" class="text-center py-8">
+                <p class="text-red-600">{{ errorMessage }}</p>
+                <button @click="fetchPositions" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  Coba Lagi
+                </button>
+              </div>
+              
+              <div v-else-if="tableData.length === 0" class="text-center py-8 text-gray-600">
+                <p>Belum ada data posisi</p>
+              </div>
+              
+              <div v-else
                 class="overflow-x-auto overflow-y-auto rounded-lg border bg-white max-h-105"
               >
                 <table class="w-full border-collapse">
@@ -306,7 +490,7 @@ const nextPage = () => {
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap flex-1 text-right"
                       >
                         <button
-                          @click="openEditPosisi"
+                          @click="openEditPosisi(row)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon class="w-4.5 h-4.5 text-black hover:text-blue-800" />
@@ -370,16 +554,23 @@ const nextPage = () => {
                   </button>
                 </div>
 
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p class="text-sm text-red-600">{{ errorMessage }}</p>
+                </div>
+
                 <div>
                   <label
                     class="block text-base font-medium text-black mb-2 mt-4"
-                    >Nama Posisi</label
+                    >Nama Posisi <span class="text-red-500">*</span></label
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.nama_posisi"
                       type="text"
-                      placeholder="Masukkan nama"
+                      placeholder="Masukkan nama posisi"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      :disabled="isLoading"
                     />
                     <PencilIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -389,13 +580,16 @@ const nextPage = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="handleTambahPosisi"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Tambah Posisi
+                    {{ isLoading ? 'Menyimpan...' : 'Tambah Posisi' }}
                   </button>
                   <button
                     @click="closeTambahPosisi"
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Batal
                   </button>
@@ -427,16 +621,23 @@ const nextPage = () => {
                   </button>
                 </div>
 
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p class="text-sm text-red-600">{{ errorMessage }}</p>
+                </div>
+
                 <div>
                   <label
                     class="block text-base font-medium text-black mb-2 mt-4"
-                    >Nama Posisi</label
+                    >Nama Posisi <span class="text-red-500">*</span></label
                   >
                   <div class="relative">
                     <input
+                      v-model="formData.nama_posisi"
                       type="text"
-                      placeholder="Masukkan nama"
+                      placeholder="Masukkan nama posisi"
                       class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+                      :disabled="isLoading"
                     />
                     <PencilSquareIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
@@ -446,13 +647,16 @@ const nextPage = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="handleEditPosisi"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Edit Posisi
+                    {{ isLoading ? 'Menyimpan...' : 'Edit Posisi' }}
                   </button>
                   <button
                     @click="closeEditPosisi"
-                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-sm border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Batal
                   </button>

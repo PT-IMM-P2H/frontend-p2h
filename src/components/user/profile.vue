@@ -44,6 +44,8 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Nama</p>
             <input
+              id="nama"
+              name="nama"
               type="text"
               placeholder="Nama Lengkap"
               class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
@@ -52,7 +54,9 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Email</p>
             <input
-              type="text"
+              id="email"
+              name="email"
+              type="email"
               placeholder="email@example.com"
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
@@ -66,7 +70,9 @@ const closeEditAkun = () => {
               Nomor Telepon
             </p>
             <input
-              type="text"
+              id="phone_number"
+              name="phone_number"
+              type="tel"
               placeholder="081xxxxxxxx"
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
@@ -76,7 +82,9 @@ const closeEditAkun = () => {
               Tanggal Lahir
             </p>
             <input
-              type="text"
+              id="birth_date"
+              name="birth_date"
+              type="date"
               placeholder="hh/bb/tttt"
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
             />
@@ -84,6 +92,8 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Perusahaan</p>
             <input
+              id="company"
+              name="company"
               type="text"
               placeholder="Perusahaan"
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md"
@@ -93,6 +103,8 @@ const closeEditAkun = () => {
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Departemen</p>
           <input
+            id="department"
+            name="department"
             type="text"
             placeholder="Departemen"
             class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
@@ -101,6 +113,8 @@ const closeEditAkun = () => {
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Status karyawan</p>
           <input
+            id="work_status"
+            name="work_status"
             type="text"
             placeholder="Status karyawan"
             class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
@@ -110,6 +124,8 @@ const closeEditAkun = () => {
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Posisi kerja</p>
           <input
+            id="position"
+            name="position"
             type="text"
             placeholder="Posisi kerja"
             class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md mb-1"
@@ -140,11 +156,13 @@ const closeEditAkun = () => {
           </div>
 
           <div>
-            <label class="block text-base font-medium text-black mb-2 mt-4"
+            <label for="edit_nama" class="block text-base font-medium text-black mb-2 mt-4"
               >Nama Lengkap</label
             >
             <div class="relative">
               <input
+                id="edit_nama"
+                name="edit_nama"
                 type="text"
                 placeholder="Masukkan nama"
                 class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
@@ -155,12 +173,14 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_phone" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Nomor Handphone</label
             >
             <div class="relative">
               <input
-                type="text"
+                id="edit_phone"
+                name="edit_phone"
+                type="tel"
                 placeholder="081xxxxxxxx"
                 class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
@@ -170,11 +190,13 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_company" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Perusahaan</label
             >
             <div class="relative">
               <input
+                id="edit_company"
+                name="edit_company"
                 type="text"
                 placeholder="Nama perusahaan"
                 class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
@@ -185,11 +207,13 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_department" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Departemen</label
             >
             <div class="relative">
               <input
+                id="edit_department"
+                name="edit_department"
                 type="text"
                 placeholder="Nama departemen"
                 class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
@@ -200,11 +224,13 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_position" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Posisi kerja</label
             >
             <div class="relative">
               <input
+                id="edit_position"
+                name="edit_position"
                 type="text"
                 placeholder="Posisi kerja"
                 class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"

@@ -30,6 +30,17 @@ const pertanyaanList = ref([
   {
     id: 1,
     pertanyaan: "Apakah anda bekerja shift / non-shift?",
+    vehicleTypes: {
+      lightVehicle: true,
+      electricVehicle: true,
+      doubleCabin: false,
+      singleCabin: false,
+      bus: false,
+      ambulance: false,
+      fireTruck: false,
+      komando: false,
+      truckSampah: false,
+    },
     jawabanList: [
       {
         id: 1,
@@ -46,6 +57,17 @@ const pertanyaanList = ref([
   {
     id: 2,
     pertanyaan: "Jokowi penjahat negri",
+    vehicleTypes: {
+      lightVehicle: false,
+      electricVehicle: false,
+      doubleCabin: false,
+      singleCabin: false,
+      bus: false,
+      ambulance: false,
+      fireTruck: false,
+      komando: false,
+      truckSampah: false,
+    },
     jawabanList: [
       {
         id: 1,
@@ -54,7 +76,6 @@ const pertanyaanList = ref([
       },
     ],
   },
-  
 ]);
 
 const openEditPertanyaan = (pertanyaan) => {
@@ -62,6 +83,7 @@ const openEditPertanyaan = (pertanyaan) => {
   editPertanyaan.value = true;
   formPertanyaan.value = pertanyaan.pertanyaan;
   formJawabanList.value = JSON.parse(JSON.stringify(pertanyaan.jawabanList));
+  vehicleTypes.value = JSON.parse(JSON.stringify(pertanyaan.vehicleTypes));
 };
 
 const closeEditPertanyaan = () => {
@@ -75,18 +97,27 @@ const closeEditPertanyaan = () => {
       pilihan: "",
     },
   ];
+  vehicleTypes.value = vehicleList.reduce((acc, vehicle) => {
+    acc[vehicle.id] = false;
+    return acc;
+  }, {});
 };
 
 const simpanEditPertanyaan = () => {
   if (editingPertanyaan.value && formPertanyaan.value.trim()) {
-    const jawabanList = formJawabanList.value.filter((form) => form.jawaban && form.pilihan);
-    
+    const jawabanList = formJawabanList.value.filter(
+      (form) => form.jawaban && form.pilihan
+    );
+
     if (jawabanList.length > 0) {
-      const index = pertanyaanList.value.findIndex((p) => p.id === editingPertanyaan.value.id);
+      const index = pertanyaanList.value.findIndex(
+        (p) => p.id === editingPertanyaan.value.id
+      );
       if (index !== -1) {
         pertanyaanList.value[index] = {
           id: editingPertanyaan.value.id,
           pertanyaan: formPertanyaan.value,
+          vehicleTypes: JSON.parse(JSON.stringify(vehicleTypes.value)),
           jawabanList: jawabanList.map((form, idx) => ({
             id: idx + 1,
             jawaban: form.jawaban,
@@ -113,6 +144,10 @@ const closetambahPertanyaan = () => {
       pilihan: "",
     },
   ];
+  vehicleTypes.value = vehicleList.reduce((acc, vehicle) => {
+    acc[vehicle.id] = false;
+    return acc;
+  }, {});
 };
 
 const vehicleList = [
@@ -152,12 +187,15 @@ const tambahKontainerPertanyaan = () => {
 
 const simpanPertanyaan = () => {
   if (formPertanyaan.value.trim()) {
-    const jawabanList = formJawabanList.value.filter((form) => form.jawaban && form.pilihan);
-    
+    const jawabanList = formJawabanList.value.filter(
+      (form) => form.jawaban && form.pilihan
+    );
+
     if (jawabanList.length > 0) {
       const newPertanyaan = {
         id: Math.max(...pertanyaanList.value.map((p) => p.id), 0) + 1,
         pertanyaan: formPertanyaan.value,
+        vehicleTypes: JSON.parse(JSON.stringify(vehicleTypes.value)),
         jawabanList: jawabanList.map((form, index) => ({
           id: index + 1,
           jawaban: form.jawaban,
@@ -223,23 +261,54 @@ const simpanPertanyaan = () => {
                     >
                       Edit
                     </button>
-
-                    <button
-                      @click="hapusPertanyaan"
-                      :disabled="selectedRows.length === 0"
-                      class="flex items-center gap-2 px-3 py-2 rounded-md transition text-sm"
-                      :class="
-                        selectedRows.length > 0
-                          ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
-                          : 'bg-gray-100 text-gray-400 border border-gray-300 cursor-not-allowed'
-                      "
-                    >
-                      <TrashIcon class="w-4 h-4" />
-                    </button>
                   </div>
 
                   <div class="px-4 pb-4">
-                    <h1 class="text-lg font-bold text-black mb-4">
+                    <div>
+                      <label
+                        class="block text-lg font-bold text-black mb-2 mt-4"
+                        >Tipe kendaraan</label
+                      >
+                      <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
+                        <div
+                          v-for="vehicle in vehicleList"
+                          :key="vehicle.id"
+                          class="flex items-center gap-2 p-2 border rounded-xl transition cursor-not-allowed"
+                          :class="
+                            pertanyaan.vehicleTypes[vehicle.id]
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-[#a9a9a9] bg-gray-100'
+                          "
+                        >
+                          <div class="relative w-5 h-5">
+                            <input
+                              disabled
+                              type="checkbox"
+                              :checked="pertanyaan.vehicleTypes[vehicle.id]"
+                              :id="vehicle.id"
+                              class="w-5 h-5 cursor-not-allowed rounded-md border-2 appearance-none bg-gray-100 border-gray-400 checked:bg-blue-500 checked:border-blue-500"
+                              style="
+                                appearance: none;
+                                -webkit-appearance: none;
+                                -moz-appearance: none;
+                              "
+                            />
+                            <CheckIcon
+                              v-if="pertanyaan.vehicleTypes[vehicle.id]"
+                              class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
+                            />
+                          </div>
+                          <label
+                            :for="vehicle.id"
+                            class="text-sm text-gray-400 cursor-pointer"
+                          >
+                            {{ vehicle.label }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h1 class="mt-4 text-lg font-bold text-black mb-4">
                       Pertanyaan
                     </h1>
 
@@ -265,7 +334,7 @@ const simpanPertanyaan = () => {
                             type="text"
                             :placeholder="jawab.jawaban"
                             disabled
-                            class="cursor-not-allowed w-full p-2 border border-[#C3C3C3] bg-gray-100 text-gray-700 rounded-md text-sm"
+                            class="cursor-not-allowed w-full p-2 border border-[#C3C3C3] bg-gray-100 text-gray-800 rounded-md text-sm"
                           />
                           <PencilIcon
                             class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
@@ -293,7 +362,8 @@ const simpanPertanyaan = () => {
             <!-- Konten tambah pertanyaan -->
             <div
               v-if="tambahPertanyaan"
-              class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+              class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            >
               <div
                 class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-[0_4px_6px_rgba(0,0,0,0.1)] p-6 md:p-8"
               >
@@ -373,8 +443,7 @@ const simpanPertanyaan = () => {
                     />
                   </div>
 
-                  <label
-                    class="block text-base font-medium text-black mb-2"
+                  <label class="block text-base font-medium text-black mb-2"
                     >Kolom Jawaban</label
                   >
                   <div class="space-y-1">
@@ -386,7 +455,7 @@ const simpanPertanyaan = () => {
                       <!-- Header dengan nomor -->
                       <div class="flex justify-between items-center mb-4">
                         <h3 class="font-semibold text-gray-700">
-                          Jawaban  {{ index + 1 }}
+                          Jawaban {{ index + 1 }}
                         </h3>
                         <button
                           v-if="formJawabanList.length > 1"
@@ -478,6 +547,7 @@ const simpanPertanyaan = () => {
                     />
                   </button>
                 </div>
+
                 <div class="flex justify-center mt-6">
                   <button
                     @click="hapusKolomPertanyaan"
@@ -487,6 +557,50 @@ const simpanPertanyaan = () => {
                     Hapus Kolom Pertanyaan
                   </button>
                 </div>
+
+                <div>
+                  <label
+                    class="block text-base font-medium text-black mb-2 mt-4"
+                    >Tipe kendaraan</label
+                  >
+                  <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
+                    <div
+                      v-for="vehicle in vehicleList"
+                      :key="vehicle.id"
+                      class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer"
+                      :class="
+                        vehicleTypes[vehicle.id]
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-[#a9a9a9] bg-white'
+                      "
+                    >
+                      <div class="relative w-5 h-5">
+                        <input
+                          type="checkbox"
+                          v-model="vehicleTypes[vehicle.id]"
+                          :id="vehicle.id"
+                          class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
+                          style="
+                            appearance: none;
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                          "
+                        />
+                        <CheckIcon
+                          v-if="vehicleTypes[vehicle.id]"
+                          class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
+                        />
+                      </div>
+                      <label
+                        :for="vehicle.id"
+                        class="text-sm text-gray-700 cursor-pointer"
+                      >
+                        {{ vehicle.label }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label
                     class="block text-base font-medium text-black mb-2 mt-4"
@@ -504,8 +618,7 @@ const simpanPertanyaan = () => {
                     />
                   </div>
 
-                  <label
-                    class="block text-base font-medium text-black mb-2"
+                  <label class="block text-base font-medium text-black mb-2"
                     >Kolom Jawaban</label
                   >
                   <div class="space-y-1">

@@ -7,7 +7,9 @@ const handleWaLink = () => {
 </script>
 
 <template>
-  <footer class="fixed bottom-0 left-0 right-0 bg-white shadow-lg font-['Montserrat'] z-40">
+  <footer class="fixed bottom-0 left-0 right-0 bg-white shadow-lg font-['Montserrat'] z-40"
+  style="background-image: url(/image_asset/); background-attachment: fixed;">
+    
     <!-- Main Footer Content -->
     <div class="px-2 py-2 md:px-6 md:py-4 w-full">
       <div

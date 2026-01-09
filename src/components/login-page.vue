@@ -36,16 +36,16 @@ const handleWaLink = () => {
 <template>
   <div
     class="fixed inset-0 flex items-center justify-center bg-cover bg-center font-sans"
-    style="background-image: url('image_asset/Backgrond.png')"
+    style="background-image: url('image_asset/BG_2.png')"
   >
     <div
-      class="w-105 h-auto bg-white rounded-[15px] flex items-center justify-center p-2.5 m-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.15)]"
+      class="w-110 h-auto bg-gray-100 rounded-[15px] flex items-center justify-center p-2.5 m-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.15)]"
     >
       <div class="w-full px-7.5 py-5 flex flex-col gap-3.75">
-        <img src="/image_asset/IMM.svg" class="w-37.5 h-auto block mx-auto" />
+        <img src="/image_asset/IMM.svg" class="w-38 h-auto block mx-auto" />
 
         <p
-          class="m-0 mb-1 mt-3 leading-tight text-center text-black text-[14px] font-sans font-medium mx-auto"
+          class="m-0 mb-1 mt-2 leading-tight text-center text-black text-[14px] font-sans font-medium mx-auto"
         >
           Pelaksanaan Pemeriksaan Harian Kendaraan Operasional PT Indominco Mandiri
         </p>
@@ -55,7 +55,7 @@ const handleWaLink = () => {
           <input
             type="tel"
             placeholder="Nomor Handphone"
-            class="px-3.75 py-3 border border-[#a1a1a1] bg-white rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
+            class="px-3.75 py-3 border border-[#a1a1a1] bg-gray-100 rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
           />
         </div>
 
@@ -64,7 +64,7 @@ const handleWaLink = () => {
           <input
             :type="showPassword ? 'text' : 'password'"
             placeholder="Password"
-            class="px-3.75 py-3 border border-[#a1a1a1] bg-white rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
+            class="px-3.75 py-3 border border-[#a1a1a1] bg-gray-100 rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
           />
           <button
             type="button"

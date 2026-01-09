@@ -12,11 +12,11 @@ import { InformationCircleIcon } from "@heroicons/vue/24/solid";
     <!-- Content -->
     <main
       class="flex-1 flex items-start md:items-center justify-center bg-cover bg-center bg-no-repeat bg-fixed px-4 pt-24 md:pt-20 pb-40 md:pb-32 overflow-y-auto"
-      style="background-image: url(/image_asset/Backgrond.png)"
+      style="background-image: url(/image_asset/BG_2.png)"
     >
       <div class="flex flex-col w-full max-w-5xl gap-4">
         <!-- Konten Welcome -->
-        <div class="p-8 md:p-10 bg-white rounded-lg shadow-md w-full mx-auto">
+        <div class="p-8 md:p-10 bg-gray-100 rounded-lg shadow-md w-full mx-auto">
           <h1 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
             Selamat datang
           </h1>

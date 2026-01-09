@@ -37,7 +37,7 @@ const closeEditAkun = () => {
     <!-- Kontent Profil -->
     <main
       class="flex-1 flex items-start md:items-center justify-center bg-cover bg-center bg-no-repeat px-4 pt-24 md:pt-8 pb-40 md:pb-20 overflow-y-auto"
-      style="background-image: url(/image_asset/Backgrond.png)"
+      style="background-image: url(/image_asset/BG_2.png)"
     >
       <div
         class="w-full h-auto flex flex-col gap-4 bg-white rounded-xl shadow-lg max-w-2xl md:max-w-4xl p-4 md:p-7 mt-2 md:mt-0">

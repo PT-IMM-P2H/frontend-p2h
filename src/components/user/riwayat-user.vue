@@ -126,7 +126,7 @@ const nextPage = () => {
     <!-- Content -->
     <main
       class="flex-1 flex items-center justify-center bg-cover bg-center bg-no-repeat px-2 md:px-2 pt-24 md:pt-8 pb-40 md:pb-20 overflow-y-auto"
-      style="background-image: url(/image_asset/Backgrond.png)"
+      style="background-image: url(/image_asset/BG_2.png)"
     >
       <div
         class="w-300 h-auto flex flex-col bg-white rounded-xl shadow-lg max-w-full md:max-w-6xl p-3 md:p-7">

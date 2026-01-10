@@ -47,10 +47,25 @@ const handleSearchVehicle = async () => {
 };
 
 // 2. Mengambil Daftar Pertanyaan Checklist
-const fetchChecklist = async (type) => {
+const fetchChecklist = async (vehicleType) => {
   try {
-    const response = await api.get(`/p2h/checklist/${type}`);
-    questions.value = response.data.payload;
+    const response = await api.get('/p2h/checklist-items');
+    
+    // Filter pertanyaan berdasarkan vehicle_tags yang cocok dengan jenis kendaraan
+    const allQuestions = response.data.payload;
+    questions.value = allQuestions.filter(q => 
+      q.vehicle_tags.includes(vehicleType)
+    );
+    
+    // Parse options format "jawaban|pilihan" dan inisialisasi jawaban
+    questions.value = questions.value.map(q => ({
+      ...q,
+      pertanyaan: q.item_name, // Map item_name ke pertanyaan untuk kompatibilitas template
+      options: q.options.map(opt => {
+        const [jawaban, pilihan] = opt.includes('|') ? opt.split('|') : [opt, 'Normal'];
+        return { jawaban, pilihan };
+      })
+    }));
     
     // Inisialisasi jawaban default: "Normal"
     questions.value.forEach((q) => {
@@ -58,6 +73,7 @@ const fetchChecklist = async (type) => {
     });
   } catch (error) {
     console.error("Gagal memuat checklist", error);
+    alert("Gagal memuat checklist: " + (error.response?.data?.detail || error.message));
   }
 };
 

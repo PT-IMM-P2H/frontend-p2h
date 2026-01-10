@@ -32,6 +32,11 @@ const hadlemonitor= () => {
   isMenuOpen.value = false;
 };
 
+const hadlehasilP2H = () => {
+  router.push({ name: "hasil-form" });
+  isMenuOpen.value = false;
+};
+
 const currentRoute = computed(() => router.currentRoute.value.name);
 
 const getButtonClass = (routeName) => {
@@ -57,7 +62,7 @@ const closeMenu = () => {
 
 <template>
   <header
-    class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-lg shadow-md px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+    class="fixed top-0 left-0 w-full z-50 bg-white/50 backdrop-blur-lg shadow-md px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
     <div class="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
       <img src="/image_asset/2_Ptimm.png" alt="Logo" class="h-7 md:h-8 w-auto shrink-0" />
 
@@ -90,6 +95,14 @@ const closeMenu = () => {
         class="text-xs lg:text-sm hover:opacity-70 transition-all duration-200 whitespace-nowrap"
       >
         Form P2H
+      </button>
+      <button
+        @click="hadlehasilP2H"
+        :class="getButtonClass('hasil-form')"
+        :style="{ color: getButtonColor('hasil-form') }"
+        class="text-xs lg:text-sm hover:opacity-70 transition-all duration-200 whitespace-nowrap"
+      >
+        Hasil P2H
       </button>
       <button
         @click="hadlepriwayat"
@@ -163,6 +176,14 @@ const closeMenu = () => {
           class="block w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-gray-50 transition-colors duration-200"
         >
           Form P2H
+        </button>
+        <button
+          @click="hadlehasilP2H"
+          :class="getButtonClass('hasil-form')"
+          :style="{ color: getButtonColor('hasil-form') }"
+          class="block w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-gray-50 transition-colors duration-200"
+        >
+          Hasil P2H
         </button>
         <button
           @click="hadlepriwayat"

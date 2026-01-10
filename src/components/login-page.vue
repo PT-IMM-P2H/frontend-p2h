@@ -38,9 +38,15 @@ const handleSignIn = async (event) => {
     loading.value = true;
     errorMessage.value = "";
     
-    const response = await api.post("/auth/login", {
-      phone_number: phoneNumber.value,
-      password: password.value
+    // OAuth2PasswordRequestForm mengharapkan username dan password sebagai form data
+    const formData = new FormData();
+    formData.append('username', phoneNumber.value);
+    formData.append('password', password.value);
+    
+    const response = await api.post("/auth/login", formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     });
     
     console.log("Login response:", response.data);

@@ -256,12 +256,22 @@ const handleTambahPengguna = async () => {
   try {
     let response;
     
+    // Prepare payload - convert empty strings to null for optional fields
+    const payload = {
+      ...formData.value,
+      birth_date: formData.value.birth_date || null,
+      company_id: formData.value.company_id || null,
+      department_id: formData.value.department_id || null,
+      position_id: formData.value.position_id || null,
+      work_status_id: formData.value.work_status_id || null,
+    };
+    
     if (editingId.value) {
       // Mode edit
-      response = await apiService.users.update(editingId.value, formData.value);
+      response = await apiService.users.update(editingId.value, payload);
     } else {
       // Mode tambah
-      response = await apiService.users.create(formData.value);
+      response = await apiService.users.create(payload);
     }
     
     if (response.data.status === 'success' || response.data.success) {
@@ -986,6 +996,7 @@ const editPengguna = async (rowId) => {
                     >
                     <input
                       type="date"
+                      v-model="formData.birth_date"
                       class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                     />
                   </div>

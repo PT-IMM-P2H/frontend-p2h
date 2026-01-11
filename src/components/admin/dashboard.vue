@@ -2,7 +2,7 @@
 import Aside from "../bar/aside.vue";
 import HeaderAdmin from "../bar/header_admin.vue";
 import { UserIcon, ArrowUpIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
-import { onMounted, ref, nextTick } from "vue";
+import { onMounted, ref, nextTick, watch } from "vue";
 import Chart from "chart.js/auto";
 
 let chartInstance = null;
@@ -10,6 +10,14 @@ let chartInstance = null;
 // Variables for date inputs
 const a = ref("1 Januari 2025");
 const u = ref("1 Januari 2026");
+
+// Variables for vehicle type dropdown
+const isVehicleTypeOpen = ref(false);
+const selectedVehicleType = ref("");
+const vehicleTypes = [
+  "Light Vehicle",
+  "Electric Vehicle"
+];
 
 const vehicleData = {
   labels: [
@@ -207,6 +215,44 @@ const chartOptions = {
 };
 
 let pieChartInstance = null;
+let vehicleTypeChartInstance = null;
+
+const vehicleTypeChartData = {
+  "Light Vehicle": {
+    labels: ["Normal", "Abnormal", "Warning"],
+    datasets: [{
+      data: [100, 8, 2],
+      backgroundColor: [
+        "rgba(16, 185, 129, 0.7)",
+        "rgba(245, 158, 11, 0.7)",
+        "rgba(239, 68, 68, 0.7)",
+      ],
+      borderColor: [
+        "rgba(16, 185, 129, 1)",
+        "rgba(245, 158, 11, 1)",
+        "rgba(239, 68, 68, 1)",
+      ],
+      borderWidth: 2,
+    }]
+  },
+  "Electric Vehicle": {
+    labels: ["Normal", "Abnormal", "Warning"],
+    datasets: [{
+      data: [38, 10, 5],
+      backgroundColor: [
+        "rgba(16, 185, 129, 0.7)",
+        "rgba(245, 158, 11, 0.7)",
+        "rgba(239, 68, 68, 0.7)",
+      ],
+      borderColor: [
+        "rgba(16, 185, 129, 1)",
+        "rgba(245, 158, 11, 1)",
+        "rgba(239, 68, 68, 1)",
+      ],
+      borderWidth: 2,
+    }]
+  }
+};
 
 const pieChartData = {
   labels: ["Normal", "Abnormal", "Warning"],
@@ -343,9 +389,47 @@ const initPieChart = async () => {
   }
 };
 
+const initVehicleTypeChart = async () => {
+  // Tunggu DOM ready
+  await nextTick();
+
+  const vehicleTypeCanvas = document.getElementById("chart-pie-vehicle-type");
+  if (!vehicleTypeCanvas) {
+    console.error("Vehicle type chart canvas element not found");
+    return;
+  }
+
+  // Destroy existing chart if it exists
+  if (vehicleTypeChartInstance) {
+    vehicleTypeChartInstance.destroy();
+    vehicleTypeChartInstance = null;
+  }
+
+  // Get data berdasarkan selectedVehicleType atau gunakan default
+  const currentType = selectedVehicleType.value || "Light Vehicle";
+  const chartData = vehicleTypeChartData[currentType];
+
+  // Create new chart
+  try {
+    vehicleTypeChartInstance = new Chart(vehicleTypeCanvas, {
+      type: "pie",
+      data: chartData,
+      options: pieChartOptions,
+    });
+  } catch (error) {
+    console.error("Error creating vehicle type chart:", error);
+  }
+};
+
+// Watch selectedVehicleType untuk update chart
+watch(selectedVehicleType, () => {
+  initVehicleTypeChart();
+});
+
 onMounted(() => {
   initChart();
   initPieChart();
+  initVehicleTypeChart();
 });
 </script>
 
@@ -492,19 +576,44 @@ onMounted(() => {
                 </div>
 
                 <!-- Tipe kendaraan -->
-                <button class="w-full bg-white rounded-lg shadow-md p-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200">
-                  <p class="text-sm font-semibold text-gray-800">
-                    Tipe Kendaraan
-                  </p>
-                  <ChevronDownIcon class="w-5 h-5 text-gray-800" />
-                </button>
+                <div class="w-full relative">
+                  <button 
+                    @click="isVehicleTypeOpen = !isVehicleTypeOpen"
+                    class="w-full bg-white rounded-lg shadow-md p-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <p class="text-sm font-semibold text-gray-800">
+                      {{ selectedVehicleType || "Tipe Kendaraan" }}
+                    </p>
+                    <ChevronDownIcon 
+                      :class="['w-5 h-5 text-gray-800 transition-transform duration-200', isVehicleTypeOpen && 'rotate-180']" 
+                    />
+                  </button>
+
+                  <!-- Dropdown Menu -->
+                  <div 
+                    v-if="isVehicleTypeOpen"
+                    class="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
+                  >
+                    <button
+                      v-for="type in vehicleTypes"
+                      :key="type"
+                      @click="selectedVehicleType = type; isVehicleTypeOpen = false"
+                      class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors duration-150 text-sm font-medium text-gray-800 first:rounded-t-lg last:rounded-b-lg"
+                    >
+                      {{ type }}
+                    </button>
+                  </div>
+                </div>
 
                 <!-- Konten Kiri kedua -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-md font-bold text-gray-800 mb-2">
-                      Tipe Kendaraan
+                    <h3 class="text-md font-bold text-gray-800 mb-4">
+                      Status {{ selectedVehicleType || 'Tipe Kendaraan' }}
                     </h3>
+                    <div class="h-74 w-full">
+                      <canvas id="chart-pie-vehicle-type"></canvas>
+                    </div>
                   </div>
 
                   <div class="bg-white rounded-lg shadow-md p-6">

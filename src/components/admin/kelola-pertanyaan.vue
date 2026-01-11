@@ -212,7 +212,7 @@ const simpanPertanyaan = () => {
 <template>
   <!-- ROOT -->
   <div class="h-screen flex flex-col font-['Montserrat'] overflow-hidden">
-    <div class="flex flex-1 min-h-0 overflow-hidden">
+    <div class="flex flex-1 min-h-0 ml-62 overflow-hidden">
       <Aside />
 
       <!-- CONTENT -->

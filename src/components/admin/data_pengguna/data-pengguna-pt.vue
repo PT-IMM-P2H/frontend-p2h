@@ -232,7 +232,7 @@ const editPengguna = (rowId) => {
     <div class="flex flex-1 overflow-hidden">
       <Aside />
 
-      <div class="flex flex-col flex-1 overflow-hidden">
+      <div class="flex flex-col flex-1 ml-62 overflow-hidden">
         <HeaderAdmin />
 
         <!-- Content -->

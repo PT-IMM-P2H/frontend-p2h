@@ -3,10 +3,17 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/solid";
 import { PhoneIcon } from "@heroicons/vue/24/outline";
+import api from "../services/api";
 
 const router = useRouter();
 const showPassword = ref(false);
 const showForgotPasswordModal = ref(false);
+
+// Form data
+const phoneNumber = ref("");
+const password = ref("");
+const isLoading = ref(false);
+const errorMessage = ref("");
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -20,8 +27,43 @@ const closeForgotPasswordModal = () => {
   showForgotPasswordModal.value = false;
 };
 
-const handleSignIn = () => {
-  router.push("/form-p2h");
+const handleSignIn = async () => {
+  errorMessage.value = "";
+  
+  // Validasi input
+  if (!phoneNumber.value || !password.value) {
+    errorMessage.value = "Nomor handphone dan password wajib diisi!";
+    return;
+  }
+  
+  try {
+    isLoading.value = true;
+    
+    // Call login API
+    const response = await api.post("/auth/login", {
+      phone_number: phoneNumber.value,
+      password: password.value,
+    });
+    
+    // Simpan token dan data user ke localStorage
+    const { access_token, user } = response.data.payload;
+    localStorage.setItem("access_token", access_token);
+    localStorage.setItem("user_data", JSON.stringify(user));
+    
+    // Redirect berdasarkan role
+    if (user.role === "superadmin" || user.role === "admin") {
+      router.push("/dashboard"); // Route admin dashboard
+    } else {
+      router.push("/form-p2h"); // Route user P2H form
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    errorMessage.value = 
+      error.response?.data?.message || 
+      "Login gagal. Periksa nomor HP dan password Anda.";
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const handleMonitorKendaraan = () => {
@@ -50,9 +92,15 @@ const handleWaLink = () => {
           Pelaksanaan Pemeriksaan Harian Kendaraan Operasional PT Indominco Mandiri
         </p>
 
+        <!-- Error Message -->
+        <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm">
+          {{ errorMessage }}
+        </div>
+
         <!-- Phone -->
         <div class="flex flex-col">
           <input
+            v-model="phoneNumber"
             type="tel"
             placeholder="Nomor Handphone"
             class="px-3.75 py-3 border border-[#a1a1a1] bg-gray-100 rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
@@ -62,9 +110,11 @@ const handleWaLink = () => {
         <!-- Password -->
         <div class="relative flex flex-col">
           <input
+            v-model="password"
             :type="showPassword ? 'text' : 'password'"
             placeholder="Password"
-            class="px-3.75 py-3 border border-[#a1a1a1] bg-gray-100 rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
+            @keyup.enter="handleSignIn"
+            class="px-3.75 py-3 border border-[#a1a1a1] bg-white rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
           />
           <button
             type="button"
@@ -96,9 +146,10 @@ const handleWaLink = () => {
         <div class="flex justify-center">
           <button
             @click="handleSignIn"
-            class="w-fit px-25 py-3 bg-[#523E95] text-white rounded-xl text-[16px] font-semilight cursor-pointer transition-colors duration-300 hover:bg-[#43317d]"
+            :disabled="isLoading"
+            class="w-fit px-25 py-3 bg-[#523E95] text-white rounded-xl text-[16px] font-semilight cursor-pointer transition-colors duration-300 hover:bg-[#43317d] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Masuk
+            {{ isLoading ? "Memproses..." : "Masuk" }}
           </button>
         </div>
 

@@ -390,6 +390,17 @@ const initPieChart = async () => {
 };
 
 const initVehicleTypeChart = async () => {
+  // Destroy existing chart if it exists
+  if (vehicleTypeChartInstance) {
+    vehicleTypeChartInstance.destroy();
+    vehicleTypeChartInstance = null;
+  }
+
+  // Jika belum dipilih, jangan buat chart
+  if (!selectedVehicleType.value) {
+    return;
+  }
+
   // Tunggu DOM ready
   await nextTick();
 
@@ -399,15 +410,8 @@ const initVehicleTypeChart = async () => {
     return;
   }
 
-  // Destroy existing chart if it exists
-  if (vehicleTypeChartInstance) {
-    vehicleTypeChartInstance.destroy();
-    vehicleTypeChartInstance = null;
-  }
-
-  // Get data berdasarkan selectedVehicleType atau gunakan default
-  const currentType = selectedVehicleType.value || "Light Vehicle";
-  const chartData = vehicleTypeChartData[currentType];
+  // Get data berdasarkan selectedVehicleType
+  const chartData = vehicleTypeChartData[selectedVehicleType.value];
 
   // Create new chart
   try {
@@ -612,7 +616,10 @@ onMounted(() => {
                       Status {{ selectedVehicleType || 'Tipe Kendaraan' }}
                     </h3>
                     <div class="h-74 w-full">
-                      <canvas id="chart-pie-vehicle-type"></canvas>
+                      <div v-if="!selectedVehicleType" class="h-full flex items-center justify-center">
+                        <p class="text-gray-400 text-center font-medium">Pilih filter untuk menampilkan</p>
+                      </div>
+                      <canvas v-else id="chart-pie-vehicle-type"></canvas>
                     </div>
                   </div>
 

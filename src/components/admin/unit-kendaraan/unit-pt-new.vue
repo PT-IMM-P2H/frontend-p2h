@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
@@ -18,8 +18,7 @@ import {
   ArrowDownIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
-import {PencilIcon, CalendarIcon} from "@heroicons/vue/24/solid";
-import apiService from "@/services/api";
+import { PencilIcon } from "@heroicons/vue/24/solid";
 
 const router = useRouter();
 
@@ -28,12 +27,9 @@ const selectAllChecked = ref(false);
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 10;
-const tambahPengguna = ref(false);
+const tambahUnitKendaraan = ref(false);
 const showFilter = ref(false);
 const sortOrder = ref("asc");
-const isLoading = ref(false);
-const errorMessage = ref("");
-const editingId = ref(null);
 const filterData = ref({
   departemen: "",
   posisi: "",
@@ -47,38 +43,12 @@ const appliedFilterData = ref({
   namaPerusahaan: "",
 });
 
-const opentambahPengguna = () => {
-  editingId.value = null;
-  formData.value = {
-    full_name: '',
-    phone_number: '',
-    email: '',
-    company_id: '',
-    department_id: '',
-    position_id: '',
-    work_status_id: '',
-    birth_date: '',
-    role: 'user',
-    kategori_pengguna: 'TRAVEL'
-  };
-  tambahPengguna.value = true;
+const opentambahUnitKendaraan = () => {
+  tambahUnitKendaraan.value = true;
 };
 
-const closeTambahPengguna = () => {
-  editingId.value = null;
-  formData.value = {
-    full_name: '',
-    phone_number: '',
-    email: '',
-    company_id: '',
-    department_id: '',
-    position_id: '',
-    work_status_id: '',
-    birth_date: '',
-    role: 'user',
-    kategori_pengguna: 'TRAVEL'
-  };
-  tambahPengguna.value = false;
+const closeTambahUnitKendaraan = () => {
+  tambahUnitKendaraan.value = false;
 };
 
 const openFilter = () => {
@@ -95,216 +65,53 @@ const applyFilter = () => {
   closeFilter();
 };
 
-const tableData = ref([]);
-
-// Master data untuk dropdown
-const companies = ref([]);
-const departments = ref([]);
-const positions = ref([]);
-const statuses = ref([]);
-const roles = [
-  { value: 'user', label: 'User' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'superadmin', label: 'Superadmin' }
-];
-
-// Form data untuk tambah/edit pengguna
-const formData = ref({
-  full_name: '',
-  phone_number: '',
-  email: '',
-  company_id: '',
-  department_id: '',
-  position_id: '',
-  work_status_id: '',
-  birth_date: '',
-  role: 'user',
-  kategori_pengguna: 'TRAVEL'
-});
-
-// Fetch master data
-const fetchMasterData = async () => {
-  try {
-    const [companiesRes, departmentsRes, positionsRes, statusesRes] = await Promise.all([
-      apiService.master.getCompanies(),
-      apiService.master.getDepartments(),
-      apiService.master.getPositions(),
-      apiService.master.getStatuses()
-    ]);
-    
-    if (companiesRes.data.status === 'success' || companiesRes.data.success) {
-      companies.value = companiesRes.data.payload;
-    }
-    if (departmentsRes.data.status === 'success' || departmentsRes.data.success) {
-      departments.value = departmentsRes.data.payload;
-    }
-    if (positionsRes.data.status === 'success' || positionsRes.data.success) {
-      positions.value = positionsRes.data.payload;
-    }
-    if (statusesRes.data.status === 'success' || statusesRes.data.success) {
-      statuses.value = statusesRes.data.payload;
-    }
-  } catch (error) {
-    console.error('Error fetching master data:', error);
-  }
-};
-
-// Fetch users dari backend (filter kategori TRAVEL)
-const fetchUsers = async () => {
-  isLoading.value = true;
-  errorMessage.value = "";
-  try {
-    const response = await apiService.users.getAll();
-    
-    if (response.data.status === 'success' || response.data.success) {
-      // Filter hanya user dengan kategori TRAVEL
-      const allUsers = response.data.payload;
-      const travelUsers = allUsers.filter(user => user.kategori_pengguna === 'TRAVEL');
-      
-      tableData.value = travelUsers.map(user => ({
-        id: user.id,
-        namaLengkap: user.full_name,
-        noHandphone: user.phone_number,
-        email: user.email,
-        namaPerusahaan: user.company?.nama_perusahaan || "-",
-        departemen: user.department?.nama_department || "-",
-        posisi: user.position?.nama_posisi || "-",
-        status: user.work_status?.nama_status || "-",
-        role: user.role,
-      }));
-    } else {
-      errorMessage.value = response.data.message || "Gagal mengambil data";
-    }
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    errorMessage.value = error.response?.data?.detail || error.response?.data?.message || error.message || "Gagal mengambil data pengguna";
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Hapus pengguna (soft delete)
-const handleDeleteUsers = async () => {
-  if (selectedRowIds.value.length === 0) {
-    alert("Pilih pengguna yang ingin dihapus!");
-    return;
-  }
-  
-  if (!confirm(`Yakin ingin menghapus ${selectedRowIds.value.length} pengguna?`)) {
-    return;
-  }
-  
-  isLoading.value = true;
-  errorMessage.value = "";
-  let deletedCount = 0;
-  
-  try {
-    for (const id of selectedRowIds.value) {
-      await apiService.users.delete(id);
-      deletedCount++;
-    }
-    
-    selectedRowIds.value = [];
-    selectAllChecked.value = false;
-    tableData.value = [];
-    
-    await fetchUsers();
-    alert(`${deletedCount} pengguna berhasil dihapus`);
-  } catch (error) {
-    console.error("Error deleting users:", error);
-    errorMessage.value = error.response?.data?.detail || error.response?.data?.message || error.message || "Gagal menghapus pengguna";
-    alert(`Error: ${errorMessage.value}\n\nBerhasil dihapus: ${deletedCount} dari ${selectedRowIds.value.length}`);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Submit tambah/edit pengguna
-const handleTambahPengguna = async () => {
-  if (!formData.value.full_name || !formData.value.phone_number || !formData.value.email) {
-    alert('Nama lengkap, nomor telepon, dan email wajib diisi!');
-    return;
-  }
-  
-  isLoading.value = true;
-  errorMessage.value = '';
-  
-  try {
-    let response;
-    
-    if (editingId.value) {
-      response = await apiService.users.update(editingId.value, formData.value);
-    } else {
-      response = await apiService.users.create(formData.value);
-    }
-    
-    if (response.data.status === 'success' || response.data.success) {
-      alert(editingId.value ? 'Pengguna berhasil diupdate' : 'Pengguna berhasil ditambahkan');
-      
-      editingId.value = null;
-      formData.value = {
-        full_name: '',
-        phone_number: '',
-        email: '',
-        company_id: '',
-        department_id: '',
-        position_id: '',
-        work_status_id: '',
-        birth_date: '',
-        role: 'user',
-        kategori_pengguna: 'TRAVEL'
-      };
-      
-      closeTambahPengguna();
-      await fetchUsers();
-    } else {
-      errorMessage.value = response.data.message || 'Gagal menyimpan data pengguna';
-      alert(errorMessage.value);
-    }
-  } catch (error) {
-    console.error('Error saving user:', error);
-    errorMessage.value = error.response?.data?.detail || error.response?.data?.message || error.message || 'Gagal menyimpan data pengguna';
-    alert(`Error: ${errorMessage.value}`);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Edit pengguna
-const editPengguna = async (rowId) => {
-  try {
-    const response = await apiService.users.getById(rowId);
-    
-    if (response.data.status === 'success' || response.data.success) {
-      const user = response.data.payload;
-      
-      editingId.value = rowId;
-      formData.value = {
-        full_name: user.full_name || '',
-        phone_number: user.phone_number || '',
-        email: user.email || '',
-        company_id: user.company_id || '',
-        department_id: user.department_id || '',
-        position_id: user.position_id || '',
-        work_status_id: user.work_status_id || '',
-        birth_date: user.birth_date || '',
-        role: user.role || 'user',
-        kategori_pengguna: 'TRAVEL'
-      };
-      
-      tambahPengguna.value = true;
-    }
-  } catch (error) {
-    console.error('Error fetching user detail:', error);
-    alert('Gagal mengambil data pengguna');
-  }
-};
-
-// Load data saat component di-mount
-onMounted(() => {
-  fetchUsers();
-  fetchMasterData();
-});
+const tableData = ref([
+  {
+    id: 1,
+    nomorLambung: "P - 309",
+    warnaNomorLambung: "Kuning",
+    nomorPolisi: "KT 1234 AB",
+    tipe: "Light Vehicle",
+    merek: "Toyota Innova reborn 2.4G",
+    user: "Era Tjahya Saputra",
+    perusahaan: "PT Indominco Mandiri",
+    tglSTNK: "7 Februari 2026",
+    tglPajak: "7 Maret 2026",
+    kirKuer: "28 Desember 2028",
+    noRangka: "MK2KSWPNUJJ000338",
+    noMesin: "4N15UCP7140",
+  },
+  {
+    id: 2,
+    nomorLambung: "P - 310",
+    warnaNomorLambung: "Hijau",
+    nomorPolisi: "KT 1235 AB",
+    tipe: "Light Vehicle",
+    merek: "Isuzu",
+    user: "Era Tjahya Saputra",
+    perusahaan: "PT Indominco Mandiri",
+    tglSTNK: "7 Maret 2026",
+    tglPajak: "7 Februari 2026",
+    kirKuer: "28 Januari 2026",
+    noRangka: "MK2KSWPNUJJ000338",
+    noMesin: "4N15UCP7140",
+  },
+  {
+    id: 3,
+    nomorLambung: "P - 311",
+    warnaNomorLambung: "Biru",
+    nomorPolisi: "KT 1235 AB",
+    tipe: "Light Vehicle",
+    merek: "Toyota Innova reborn 2.4G",
+    user: "Era Tjahya Saputra",
+    perusahaan: "PT Indominco Mandiri",
+    tglSTNK: "28 Desember 2025",
+    tglPajak: "15 Mei 2026",
+    kirKuer: "7 Februari 2026",
+    noRangka: "MK2KSWPNUJJ000338",
+    noMesin: "4N15UCP7140",
+  },
+]);
 
 const selectRow = (rowId) => {
   const index = selectedRowIds.value.indexOf(rowId);
@@ -335,6 +142,14 @@ const isRowSelected = (rowId) => {
   return selectedRowIds.value.includes(rowId);
 };
 
+const editKendaraan = (rowId) => {
+  const vehicleData = tableData.value.find(row => row.id === rowId);
+  if (vehicleData) {
+    localStorage.setItem('currentVehicleData', JSON.stringify(vehicleData));
+  }
+  router.push(`/edit-unit-pt/${rowId}`);
+};
+
 // Helper function untuk normalize string (hapus whitespace dan karakter khusus)
 const normalizeString = (str) => {
   return str.toLowerCase().replace(/[\s\-./]/g, "");
@@ -349,10 +164,13 @@ const filteredTableData = computed(() => {
     const query = normalizeString(searchQuery.value);
     filtered = filtered.filter((row) => {
       return (
-        normalizeString(row.namaLengkap).includes(query) ||
-        normalizeString(row.noHandphone).includes(query) ||
-        normalizeString(row.departemen).includes(query) ||
-        normalizeString(row.posisi).includes(query)
+        normalizeString(row.nomorLambung).includes(query) ||
+        normalizeString(row.warnaNomorLambung).includes(query) ||
+        normalizeString(row.nomorPolisi).includes(query) ||
+        normalizeString(row.tipe).includes(query) ||
+        normalizeString(row.merek).includes(query) ||
+        normalizeString(row.user).includes(query) ||
+        normalizeString(row.perusahaan).includes(query)
       );
     });
   }
@@ -360,17 +178,17 @@ const filteredTableData = computed(() => {
   // Filter berdasarkan filter yang diterapkan
   if (appliedFilterData.value.departemen) {
     filtered = filtered.filter(
-      (row) => row.departemen === appliedFilterData.value.departemen
+      (row) => row.tipe === appliedFilterData.value.departemen
     );
   }
   if (appliedFilterData.value.posisi) {
     filtered = filtered.filter(
-      (row) => row.posisi === appliedFilterData.value.posisi
+      (row) => row.merek === appliedFilterData.value.posisi
     );
   }
   if (appliedFilterData.value.status) {
     filtered = filtered.filter(
-      (row) => row.status === appliedFilterData.value.status
+      (row) => row.warnaNomorLambung === appliedFilterData.value.status
     );
   }
   if (appliedFilterData.value.namaPerusahaan) {
@@ -420,27 +238,73 @@ const sortByName = () => {
   if (sortOrder.value === "asc") {
     sortOrder.value = "desc";
     tableData.value = [...tableData.value].sort((a, b) =>
-      b.namaLengkap.localeCompare(a.namaLengkap)
+      b.nomorLambung.localeCompare(a.nomorLambung)
     );
   } else {
     sortOrder.value = "asc";
     tableData.value = [...tableData.value].sort((a, b) =>
-      a.namaLengkap.localeCompare(b.namaLengkap)
+      a.nomorLambung.localeCompare(b.nomorLambung)
     );
   }
   currentPage.value = 1;
 };
 
+const getWarnaNomorLambungStyle = (warna) => {
+  const styles = {
+    Kuning: { bg: "#F7E19C", text: "#8B6F47" },
+    Hijau: { bg: "#A7E8BF", text: "#1A5C3F" },
+    Biru: { bg: "#A8D4FF", text: "#0C5460" },
+  };
+  return styles[warna] || { bg: "#E2E3E5", text: "#383D41" };
+};
 
+const getDateStyle = (dateString) => {
+  // Parse tanggal format "DD Bulan YYYY"
+  const bulanMap = {
+    Januari: 0,
+    Februari: 1,
+    Maret: 2,
+    April: 3,
+    Mei: 4,
+    Juni: 5,
+    Juli: 6,
+    Agustus: 7,
+    September: 8,
+    Oktober: 9,
+    November: 10,
+    Desember: 11,
+  };
+
+  const parts = dateString.split(" ");
+  const day = parseInt(parts[0]);
+  const month = bulanMap[parts[1]];
+  const year = parseInt(parts[2]);
+
+  const targetDate = new Date(year, month, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Hitung selisih bulan
+  const monthDiff =
+    (targetDate.getFullYear() - today.getFullYear()) * 12 +
+    (targetDate.getMonth() - today.getMonth());
+
+  if (monthDiff === 1) {
+    return { bg: "#FFE5E5", text: "#C41E3A" }; // Merah
+  } else if (monthDiff === 2) {
+    return { bg: "#FFF3CD", text: "#856404" }; // Kuning
+  } else {
+    return { bg: "#E2E3E5", text: "#383D41" }; // Abu-abu
+  }
+};
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col font-['Montserrat']">
     <div class="flex flex-1 overflow-hidden">
-    <div class="flex flex-1 overflow-hidden">
       <Aside />
 
-      <div class="flex flex-col flex-1 ml-62 overflow-hidden">
+      <div class="flex flex-col flex-1 overflow-hidden">
         <HeaderAdmin />
 
         <!-- Content -->
@@ -450,14 +314,7 @@ const sortByName = () => {
             class="bg-white rounded-lg shadow-md p-1 pl-5 mb-2 -mt-1 shrink-0"
           >
             <h1 class="text-base font-bold text-[#523E95] text-left">
-              Travel
-        <main class="bg-[#EFEFEF] flex-1 flex flex-col p-3 overflow-hidden">
-          <!-- Judul -->
-          <div
-            class="bg-white rounded-lg shadow-md p-1 pl-5 mb-2 -mt-1 shrink-0"
-          >
-            <h1 class="text-base font-bold text-[#523E95] text-left">
-              Travel
+              PT Indominco Mandiri
             </h1>
           </div>
           <div
@@ -471,11 +328,11 @@ const sortByName = () => {
               <div class="flex items-center gap-3">
                 <!-- Tambah pengguna Button -->
                 <button
-                  @click="opentambahPengguna"
+                  @click="opentambahUnitKendaraan"
                   class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-white bg-[#6444C6] hover:bg-[#5c3db8] transition text-sm"
                 >
                   <UserPlusIcon class="w-5 h-5" />
-                  <span>Tambah Pengguna</span>
+                  <span>Tambah Unit Kendaraan</span>
                 </button>
 
                 <!-- Upload button -->
@@ -495,13 +352,10 @@ const sortByName = () => {
                     class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
                   />
                   <input
-                    id="search-pengguna-travel"
-                    name="search"
                     v-model="searchQuery"
                     @input="currentPage = 1"
                     type="text"
-                    placeholder="Cari nama..."
-                    aria-label="Cari pengguna Travel"
+                    placeholder="Cari..."
                     class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -533,17 +387,15 @@ const sortByName = () => {
 
                 <!-- Delete Button -->
                 <button
-                  @click="handleDeleteUsers"
-                  :disabled="selectedRowIds.length === 0 || isLoading"
+                  :disabled="selectedRowIds.length === 0"
                   class="flex items-center gap-2 px-3 py-2 rounded-md transition text-sm"
                   :class="
-                    selectedRowIds.length > 0 && !isLoading
+                    selectedRowIds.length > 0
                       ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
                       : 'bg-gray-100 text-gray-400 border border-gray-300 cursor-not-allowed'
                   "
                 >
                   <TrashIcon class="w-4 h-4" />
-                  <span v-if="selectedRowIds.length > 0">{{ isLoading ? 'Loading...' : 'Hapus' }}</span>
                 </button>
               </div>
             </div>
@@ -552,26 +404,7 @@ const sortByName = () => {
             <div
               class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden"
             >
-              <!-- Loading & Error Messages -->
-              <div v-if="isLoading" class="text-center py-8 text-gray-600">
-                <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full" role="status">
-                  <span class="sr-only">Loading...</span>
-                </div>
-                <p class="mt-2">Memuat data...</p>
-              </div>
-              
-              <div v-else-if="errorMessage" class="text-center py-8">
-                <p class="text-red-600">{{ errorMessage }}</p>
-                <button @click="fetchUsers" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                  Coba Lagi
-                </button>
-              </div>
-              
-              <div v-else-if="tableData.length === 0" class="text-center py-8 text-gray-600">
-                <p>Belum ada data pengguna</p>
-              </div>
-              
-              <div v-else
+              <div
                 class="overflow-x-auto overflow-y-auto rounded-lg border bg-white max-h-105"
               >
                 <table class="w-full border-collapse">
@@ -605,7 +438,7 @@ const sortByName = () => {
                         @click="sortByName"
                       >
                         <div class="flex items-center gap-2">
-                          <span>Nama Lengkap</span>
+                          <span>Nomor lambung</span>
                           <ArrowDownIcon
                             v-if="sortOrder === 'asc'"
                             class="w-4 h-4"
@@ -616,34 +449,58 @@ const sortByName = () => {
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-24"
                       >
-                        No. Handphone
+                        Warna No. lambung
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
                       >
-                        Email
-                      </th>
-                      <th
-                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
-                      >
-                        Nama Perusahaan
-                      </th>
-                      <th
-                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
-                      >
-                        Departemen
+                        Nomor Polisi
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20"
                       >
-                        Posisi
+                        Tipe
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20"
                       >
-                        Status
+                        Merek
                       </th>
-
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        User
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Perusahaan
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Tgl. STNK
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Tgl. Pajak
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        KIR / KUER
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        No. Rangka
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        No. Mesin
+                      </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-16"
                       >
@@ -682,44 +539,96 @@ const sortByName = () => {
                       <td
                         class="px-4 py-3 text-gray-800 whitespace-nowrap min-w-32 text-xs"
                       >
-                        {{ row.namaLengkap }}
+                        {{ row.nomorLambung }}
                       </td>
-                      <td
-                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-24"
-                      >
-                        {{ row.noHandphone }}
-                      </td>
-                      <td
-                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-24"
-                      >
-                        {{ row.email }}
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-24">
+                        <span
+                          class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                          :style="{
+                            backgroundColor: getWarnaNomorLambungStyle(
+                              row.warnaNomorLambung
+                            ).bg,
+                            color: getWarnaNomorLambungStyle(
+                              row.warnaNomorLambung
+                            ).text,
+                          }"
+                        >
+                          {{ row.warnaNomorLambung }}
+                        </span>
                       </td>
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
                       >
-                        {{ row.namaPerusahaan }}
+                        {{ row.nomorPolisi }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20"
+                      >
+                        {{ row.tipe }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20"
+                      >
+                        {{ row.merek }}
                       </td>
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
                       >
-                        {{ row.departemen }}
+                        {{ row.user }}
                       </td>
                       <td
-                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20"
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
                       >
-                        {{ row.posisi }}
+                        {{ row.perusahaan }}
+                      </td>
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-28">
+                        <span
+                          class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                          :style="{
+                            backgroundColor: getDateStyle(row.tglSTNK).bg,
+                            color: getDateStyle(row.tglSTNK).text,
+                          }"
+                        >
+                          {{ row.tglSTNK }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-28">
+                        <span
+                          class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                          :style="{
+                            backgroundColor: getDateStyle(row.tglPajak).bg,
+                            color: getDateStyle(row.tglPajak).text,
+                          }"
+                        >
+                          {{ row.tglPajak }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-xs whitespace-nowrap min-w-28">
+                        <span
+                          class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+                          :style="{
+                            backgroundColor: getDateStyle(row.kirKuer).bg,
+                            color: getDateStyle(row.kirKuer).text,
+                          }"
+                        >
+                          {{ row.kirKuer }}
+                        </span>
                       </td>
                       <td
-                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20"
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
                       >
-                        {{ row.status }}
+                        {{ row.noRangka }}
                       </td>
-
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
+                        {{ row.noMesin }}
+                      </td>
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-16"
                       >
                         <button
-                          @click="editPengguna(row.id)"
+                          @click="editKendaraan(row.id)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon
@@ -763,20 +672,20 @@ const sortByName = () => {
 
             <!-- Konten Tambah pengguna -->
             <div
-              v-if="tambahPengguna"
+              v-if="tambahUnitKendaraan"
               class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
             >
               <div
                 class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-[0_4px_6px_rgba(0,0,0,0.1)] p-6 md:p-8"
               >
                 <div
-                  class="flex justify-between items-center mb-1 pb-3 border-b border-gray-200"
+                  class="flex justify-between items-center mb-2 pb-3 border-b border-gray-200"
                 >
                   <h2 class="text-lg md:text-xl font-semibold text-gray-900">
-                    {{ editingId ? 'Edit Pengguna Travel' : 'Tambah Pengguna Travel' }}
+                    Tambah Unit Kendaraan
                   </h2>
                   <button
-                    @click="closeTambahPengguna"
+                    @click="closeTambahUnitKendaraan"
                     class="shrink-0 p-1 hover:bg-gray-100 rounded-md transition"
                   >
                     <XMarkIcon
@@ -785,21 +694,17 @@ const sortByName = () => {
                   </button>
                 </div>
 
-                <!-- Row 1: Nama Lengkap dan Nomor Telepon -->
+                <!-- Row -->
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      for="full_name_travel"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Nama Lengkap</label
+                      >Nomor Lambung</label
                     >
                     <div class="relative">
                       <input
-                        id="full_name_travel"
-                        name="full_name"
-                        v-model="formData.full_name"
                         type="text"
-                        placeholder="Masukkan nama"
+                        placeholder="Masukkan nomor lambung"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                       />
                       <PencilIcon
@@ -810,17 +715,49 @@ const sortByName = () => {
 
                   <div>
                     <label
-                      for="phone_number_travel"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Nomor Telepon</label
+                      >Warna nomor lambung</label
+                    >
+                    <div class="relative">
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih warna nomor lambung</option>
+                      </select>
+                      <ChevronDownIcon
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label
+                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
+                      >Nomor Polisi</label
                     >
                     <div class="relative">
                       <input
-                        id="phone_number_travel"
-                        name="phone_number"
-                        v-model="formData.phone_number"
                         type="text"
-                        placeholder="081xxxxxxxx"
+                        placeholder="Masukkan nomor polisi"
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                      />
+                      <PencilIcon
+                        class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
+                      >Merek</label
+                    >
+                    <div class="relative">
+                      <input
+                        type="text"
+                        placeholder="Masukkan merek kendaraan"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                       />
                       <PencilIcon
@@ -830,21 +767,33 @@ const sortByName = () => {
                   </div>
                 </div>
 
-                <!-- Row 2: Email dan Nama Perusahaan -->
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
-                      for="email_travel"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Email</label
+                      >Tipe</label
+                    >
+                    <div class="relative">
+                      <select
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
+                      >
+                        <option value="">Pilih tipe kendaraan</option>
+                      </select>
+                      <ChevronDownIcon
+                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
+                      >User</label
                     >
                     <div class="relative">
                       <input
-                        id="email_travel"
-                        name="email"
-                        v-model="formData.email"
-                        type="email"
-                        placeholder="email@example.com"
+                        type="text"
+                        placeholder="Masukkan nama user"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                       />
                       <PencilIcon
@@ -852,137 +801,93 @@ const sortByName = () => {
                       />
                     </div>
                   </div>
+                </div>
 
+                <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
-                      for="company_id_travel"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Nama Perusahaan</label
+                      >Perusahaan</label
                     >
                     <div class="relative">
                       <select
-                        id="company_id_travel"
-                        name="company_id"
-                        v-model="formData.company_id"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
                       >
                         <option value="">Pilih nama perusahaan</option>
-                        <option v-for="company in companies" :key="company.id" :value="company.id">
-                          {{ company.nama_perusahaan }}
-                        </option>
                       </select>
                       <ChevronDownIcon
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>
                   </div>
-                </div>
 
-                <!-- Row 3: Departemen dan Posisi -->
-                <div class="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label
-                      for="department_id_travel"
-                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Departemen</label
-                    >
-                    <div class="relative">
-                      <select
-                        id="department_id_travel"
-                        name="department_id"
-                        v-model="formData.department_id"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
-                      >
-                        <option value="">Pilih departemen</option>
-                        <option v-for="dept in departments" :key="dept.id" :value="dept.id">
-                          {{ dept.nama_department }}
-                        </option>
-                      </select>
-                      <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      for="position_id_travel"
-                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Posisi</label
-                    >
-                    <div class="relative">
-                      <select
-                        id="position_id_travel"
-                        name="position_id"
-                        v-model="formData.position_id"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
-                      >
-                        <option value="">Pilih posisi</option>
-                        <option v-for="pos in positions" :key="pos.id" :value="pos.id">
-                          {{ pos.nama_posisi }}
-                        </option>
-                      </select>
-                      <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Row 4: Status Pekerjaan dan Tanggal Lahir -->
-                <div class="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label
-                      for="work_status_id_travel"
-                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Status Pekerjaan</label
-                    >
-                    <div class="relative">
-                      <select
-                        id="work_status_id_travel"
-                        name="work_status_id"
-                        v-model="formData.work_status_id"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
-                      >
-                        <option value="">Pilih status pekerjaan</option>
-                        <option v-for="status in statuses" :key="status.id" :value="status.id">
-                          {{ status.nama_status }}
-                        </option>
-                      </select>
-                      <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
-                      />
-                    </div>
-                  </div>
                   <div>
                     <label
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Tanggal Lahir</label
+                      >Tanggal STNK</label
                     >
                     <input
-                      v-model="formData.birth_date"
                       type="date"
                       class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                     />
                   </div>
                 </div>
+
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
-                      >Role</label
+                      >Tanggal Pajak</label
+                    >
+                    <input
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
+                      >KIR / KUER</label
+                    >
+                    <input
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label
+                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
+                      >Nomor Rangka</label
                     >
                     <div class="relative">
-                      <select
-                        v-model="formData.role"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
-                      >
-                        <option value="">Pilih role</option>
-                        <option v-for="role in roles" :key="role.value" :value="role.value">
-                          {{ role.label }}
-                        </option>
-                      </select>
-                      <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
+                      <input
+                        type="text"
+                        placeholder="Masukkan nomor rangka"
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                      />
+                      <PencilIcon
+                        class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      class="block text-base font-medium text-gray-800 mb-1 mt-1"
+                      >Nomor Mesin</label
+                    >
+                    <div class="relative">
+                      <input
+                        type="text"
+                        placeholder="Masukkan nomor mesin"
+                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                      />
+                      <PencilIcon
+                        class="absolute right-3 top-2.5 w-4 h-4 text-[#b2b2b2]"
                       />
                     </div>
                   </div>
@@ -990,14 +895,12 @@ const sortByName = () => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    @click="handleTambahPengguna"
-                    :disabled="isLoading"
-                    class="px-6 md:px-6 py-2 text-sm md:text-base bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50"
+                    class="px-6 md:px-6 py-2 text-sm md:text-base bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
                   >
-                    {{ isLoading ? 'Loading...' : (editingId ? 'Update Pengguna' : 'Tambah Pengguna') }}
+                    Tambah Pengguna
                   </button>
                   <button
-                    @click="closeTambahPengguna"
+                    @click="closeTambahUnitKendaraan"
                     class="px-6 md:px-6 py-2 text-sm md:text-base border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
                   >
                     Batal
@@ -1030,7 +933,26 @@ const sortByName = () => {
                   </button>
                 </div>
 
-                <!-- Perusahaan -->
+                <!-- Warna Nomor Lambung -->
+                <div>
+                  <label
+                    class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+                    >Warna Nomor Lambung</label
+                  >
+                  <div class="relative">
+                    <select
+                      v-model="filterData.status"
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Warna</option>
+                    </select>
+                    <ChevronDownIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
+                    />
+                  </div>
+                </div>
+
+                <!-- Nama Perusahaan -->
                 <div>
                   <label
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
@@ -1049,18 +971,18 @@ const sortByName = () => {
                   </div>
                 </div>
 
-                <!-- Departemen -->
+                <!-- Tipe -->
                 <div>
                   <label
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
-                    >Departemen</label
+                    >Tipe Kendaraan</label
                   >
                   <div class="relative">
                     <select
                       v-model="filterData.departemen"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
-                      <option value="">Pilih Departemen</option>
+                      <option value="">Pilih Tipe</option>
                     </select>
                     <ChevronDownIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -1068,18 +990,18 @@ const sortByName = () => {
                   </div>
                 </div>
 
-                <!-- Posisi Kerja -->
+                <!-- Merek -->
                 <div>
                   <label
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
-                    >Posisi Kerja</label
+                    >Merek</label
                   >
                   <div class="relative">
                     <select
                       v-model="filterData.posisi"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
-                      <option value="">Pilih Posisi Kerja</option>
+                      <option value="">Pilih Merek</option>
                     </select>
                     <ChevronDownIcon
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -1087,23 +1009,40 @@ const sortByName = () => {
                   </div>
                 </div>
 
-                <!-- Status Kerja -->
+                <!-- Tanggal STNK -->
                 <div>
                   <label
                     class="block text-sm font-medium text-gray-800 mb-2 mt-2"
-                    >Status Kerja</label
+                    >Tanggal STNK</label
                   >
-                  <div class="relative">
-                    <select
-                      v-model="filterData.status"
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
-                    >
-                      <option value="">Pilih Status Kerja</option>
-                    </select>
-                    <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
+                </div>
+
+                <!-- Tanggal Pajak -->
+                <div>
+                  <label
+                    class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+                    >Tanggal Pajak</label
+                  >
+                  <input
+                    type="date"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
+                </div>
+
+                <!-- Tanggal KIR / KUER -->
+                <div>
+                  <label
+                    class="block text-sm font-medium text-gray-800 mb-2 mt-2"
+                    >Tanggal KIR / KUER</label
+                  >
+                  <input
+                    type="date"
+                    class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8]"
+                  />
                 </div>
 
                 <div class="flex justify-center gap-3 mt-6">

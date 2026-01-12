@@ -54,7 +54,8 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Nama</p>
             <input
-              v-model="userName"
+              id="nama"
+              name="nama"
               type="text"
               placeholder="Nama Lengkap"
               disabled
@@ -64,8 +65,9 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Email</p>
             <input
-              v-model="userEmail"
-              type="text"
+              id="email"
+              name="email"
+              type="email"
               placeholder="email@example.com"
               disabled
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
@@ -80,8 +82,9 @@ const closeEditAkun = () => {
               Nomor Telepon
             </p>
             <input
-              v-model="userNoTelepon"
-              type="text"
+              id="phone_number"
+              name="phone_number"
+              type="tel"
               placeholder="081xxxxxxxx"
               disabled
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
@@ -92,8 +95,9 @@ const closeEditAkun = () => {
               Tanggal Lahir
             </p>
             <input
-              v-model="userTanggalLahir"
-              type="text"
+              id="birth_date"
+              name="birth_date"
+              type="date"
               placeholder="hh/bb/tttt"
               disabled
               class="w-full p-2 border text-sm border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
@@ -102,7 +106,8 @@ const closeEditAkun = () => {
           <div>
             <p class="text-base font-regular text-gray-800 mb-1">Perusahaan</p>
             <input
-              v-model="userPerusahaan"
+              id="company"
+              name="company"
               type="text"
               placeholder="Perusahaan"
               disabled
@@ -113,7 +118,8 @@ const closeEditAkun = () => {
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Departemen</p>
           <input
-            v-model="userDepartemen"
+            id="department"
+            name="department"
             type="text"
             placeholder="Departemen"
             disabled
@@ -123,7 +129,8 @@ const closeEditAkun = () => {
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Status</p>
           <input
-            v-model="userStatusKaryawan"
+            id="work_status"
+            name="work_status"
             type="text"
             placeholder="Status"
             disabled
@@ -134,7 +141,8 @@ const closeEditAkun = () => {
         <div>
           <p class="text-base font-regular text-gray-800 mb-1">Posisi kerja</p>
           <input
-            v-model="userPosisiKerja"
+            id="position"
+            name="position"
             type="text"
             placeholder="Posisi kerja"
             disabled
@@ -166,11 +174,13 @@ const closeEditAkun = () => {
           </div>
 
           <div>
-            <label class="block text-base font-medium text-black mb-2 mt-4"
+            <label for="edit_nama" class="block text-base font-medium text-black mb-2 mt-4"
               >Nama Lengkap</label
             >
             <div class="relative">
               <input
+                id="edit_nama"
+                name="edit_nama"
                 type="text"
                 placeholder="Masukkan nama"
                 class="w-full p-2 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
@@ -181,12 +191,14 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_phone" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Nomor Handphone</label
             >
             <div class="relative">
               <input
-                type="text"
+                id="edit_phone"
+                name="edit_phone"
+                type="tel"
                 placeholder="081xxxxxxxx"
                 class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
               />
@@ -196,47 +208,53 @@ const closeEditAkun = () => {
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_company" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Perusahaan</label
             >
             <div class="relative">
-              <select
-                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
-              >
-                <option value="">Pilih perusahaan</option>
-              </select>
-              <ChevronDownIcon
-                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3] pointer-events-none"
+              <input
+                id="edit_company"
+                name="edit_company"
+                type="text"
+                placeholder="Nama perusahaan"
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+              />
+              <ChevronRightIcon
+                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
               />
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_department" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Departemen</label
             >
             <div class="relative">
-              <select
-                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
-              >
-                <option value="">Pilih departemen</option>
-              </select>
-              <ChevronDownIcon
-                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3] pointer-events-none"
+              <input
+                id="edit_department"
+                name="edit_department"
+                type="text"
+                placeholder="Nama departemen"
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+              />
+              <ChevronRightIcon
+                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
               />
             </div>
           </div>
           <div>
-            <label class="block text-base font-medium text-gray-800 mb-2 mt-2"
+            <label for="edit_position" class="block text-base font-medium text-gray-800 mb-2 mt-2"
               >Posisi kerja</label
             >
             <div class="relative">
-              <select
-                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
-              >
-                <option value="">Pilih posisi kerja</option>
-              </select>
-              <ChevronDownIcon
-                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3] pointer-events-none"
+              <input
+                id="edit_position"
+                name="edit_position"
+                type="text"
+                placeholder="Posisi kerja"
+                class="w-full p-2 pr-10 border text-sm border-[#C3C3C3] bg-white text-gray-700 rounded-sm focus:outline-none focus:border-[#A90CF8]"
+              />
+              <ChevronRightIcon
+                class="absolute right-3 top-2.5 w-5 h-5 text-[#C3C3C3]"
               />
             </div>
           </div>

@@ -27,42 +27,61 @@ const closeForgotPasswordModal = () => {
   showForgotPasswordModal.value = false;
 };
 
-const handleSignIn = async () => {
-  errorMessage.value = "";
+const phoneNumber = ref("");
+const password = ref("");
+const loading = ref(false);
+const errorMessage = ref("");
+
+const handleSignIn = async (event) => {
+  if (event) event.preventDefault();
   
-  // Validasi input
   if (!phoneNumber.value || !password.value) {
-    errorMessage.value = "Nomor handphone dan password wajib diisi!";
+    errorMessage.value = "Nomor HP dan Password harus diisi";
     return;
   }
   
   try {
-    isLoading.value = true;
+    loading.value = true;
+    errorMessage.value = "";
     
-    // Call login API
-    const response = await api.post("/auth/login", {
-      phone_number: phoneNumber.value,
-      password: password.value,
+    // OAuth2PasswordRequestForm mengharapkan username dan password sebagai form data
+    const formData = new FormData();
+    formData.append('username', phoneNumber.value);
+    formData.append('password', password.value);
+    
+    const response = await api.post("/auth/login", formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     });
     
-    // Simpan token dan data user ke localStorage
-    const { access_token, user } = response.data.payload;
-    localStorage.setItem("access_token", access_token);
-    localStorage.setItem("user_data", JSON.stringify(user));
+    console.log("Login response:", response.data);
     
-    // Redirect berdasarkan role
-    if (user.role === "superadmin" || user.role === "admin") {
-      router.push("/dashboard"); // Route admin dashboard
-    } else {
-      router.push("/form-p2h"); // Route user P2H form
+    // Backend menggunakan status: 'success' bukan success: true
+    if (response.data.status === 'success' && response.data.payload) {
+      const { access_token, user } = response.data.payload;
+      
+      console.log("User data:", user);
+      console.log("User role:", user.role);
+      
+      // Simpan token dan user data ke localStorage
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("user_data", JSON.stringify(user));
+      
+      // Redirect berdasarkan role
+      if (user.role === "superadmin" || user.role === "admin") {
+        console.log("Redirecting to dashboard...");
+        await router.push("/dashboard");
+      } else {
+        console.log("Redirecting to form-p2h...");
+        await router.push("/form-p2h");
+      }
     }
   } catch (error) {
     console.error("Login error:", error);
-    errorMessage.value = 
-      error.response?.data?.message || 
-      "Login gagal. Periksa nomor HP dan password Anda.";
+    errorMessage.value = error.response?.data?.detail || "Nomor HP atau Password salah";
   } finally {
-    isLoading.value = false;
+    loading.value = false;
   }
 };
 
@@ -97,61 +116,74 @@ const handleWaLink = () => {
           {{ errorMessage }}
         </div>
 
-        <!-- Phone -->
-        <div class="flex flex-col">
-          <input
-            v-model="phoneNumber"
-            type="tel"
-            placeholder="Nomor Handphone"
-            class="px-3.75 py-3 border border-[#a1a1a1] bg-gray-100 rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
-          />
-        </div>
-
-        <!-- Password -->
-        <div class="relative flex flex-col">
-          <input
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="Password"
-            @keyup.enter="handleSignIn"
-            class="px-3.75 py-3 border border-[#a1a1a1] bg-white rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
-          />
-          <button
-            type="button"
-            @click="togglePasswordVisibility"
-            class="absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none p-0 cursor-pointer w-5 h-5 flex items-center justify-center transition-all duration-300 hover:opacity-70"
-          >
-            <EyeIcon
-              v-if="showPassword"
-              class="w-5 h-5 text-[#646cff] hover:text-[#535bf2]"
+        <!-- Login Form -->
+        <form @submit="handleSignIn" class="flex flex-col gap-3.75">
+          <!-- Phone -->
+          <div class="flex flex-col">
+            <input
+              id="phone_number"
+              name="phone_number"
+              v-model="phoneNumber"
+              type="tel"
+              placeholder="Nomor Handphone"
+              autocomplete="tel"
+              class="px-3.75 py-3 border border-[#a1a1a1] bg-white rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
             />
-            <EyeSlashIcon
-              v-else
-              class="w-5 h-5 text-[#646cff] hover:text-[#535bf2]"
+          </div>
+
+          <!-- Password -->
+          <div class="relative flex flex-col">
+            <input
+              id="password"
+              name="password"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Password"
+              autocomplete="current-password"
+              class="px-3.75 py-3 border border-[#a1a1a1] bg-white rounded-lg text-[14px] text-[#333] transition-colors duration-300 focus:outline-none focus:border-[#646cff] focus:ring-3 focus:ring-[#646cff]/10"
             />
-          </button>
-        </div>
+            <button
+              type="button"
+              @click="togglePasswordVisibility"
+              class="absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none p-0 cursor-pointer w-5 h-5 flex items-center justify-center transition-all duration-300 hover:opacity-70"
+            >
+              <EyeIcon
+                v-if="showPassword"
+                class="w-5 h-5 text-[#646cff] hover:text-[#535bf2]"
+              />
+              <EyeSlashIcon
+                v-else
+                class="w-5 h-5 text-[#646cff] hover:text-[#535bf2]"
+              />
+            </button>
+          </div>
 
-        <!-- Forgot -->
-        <div class="flex justify-end mb-2.5">
-          <a
-            @click.prevent="openForgotPasswordModal"
-            class="text-[13px] font-semibold text-[#646cff] transition-colors duration-300 hover:text-[#535bf2] hover:underline"
-          >
-            Lupa Password?
-          </a>
-        </div>
+          <!-- Error Message -->
+          <div v-if="errorMessage" class="p-3 bg-red-50 border-l-4 border-red-500 rounded">
+            <p class="text-red-700 text-sm">{{ errorMessage }}</p>
+          </div>
 
-        <!-- Sign In -->
-        <div class="flex justify-center">
-          <button
-            @click="handleSignIn"
-            :disabled="isLoading"
-            class="w-fit px-25 py-3 bg-[#523E95] text-white rounded-xl text-[16px] font-semilight cursor-pointer transition-colors duration-300 hover:bg-[#43317d] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {{ isLoading ? "Memproses..." : "Masuk" }}
-          </button>
-        </div>
+          <!-- Forgot -->
+          <div class="flex justify-end mb-2.5">
+            <a
+              @click.prevent="openForgotPasswordModal"
+              class="text-[13px] font-semibold text-[#646cff] transition-colors duration-300 hover:text-[#535bf2] hover:underline cursor-pointer"
+            >
+              Lupa Password?
+            </a>
+          </div>
+
+          <!-- Sign In -->
+          <div class="flex justify-center">
+            <button
+              type="submit"
+              :disabled="loading"
+              class="w-fit px-25 py-3 bg-[#523E95] text-white rounded-xl text-[16px] font-semilight cursor-pointer transition-colors duration-300 hover:bg-[#43317d] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ loading ? "Memproses..." : "Masuk" }}
+            </button>
+          </div>
+        </form>
 
         <hr class="border-t-3 border-[#b7b7b7] rounded-lg m-0.5" />
 

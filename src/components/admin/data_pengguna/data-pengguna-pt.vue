@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Aside from "../../bar/aside.vue";
 import HeaderAdmin from "../../bar/header_admin.vue";
@@ -19,6 +19,7 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 import {PencilIcon, CalendarIcon} from "@heroicons/vue/24/solid";
+import apiService from "@/services/api";
 
 const router = useRouter();
 
@@ -30,6 +31,10 @@ const itemsPerPage = 10;
 const tambahPengguna = ref(false);
 const showFilter = ref(false);
 const sortOrder = ref("asc");
+const isLoading = ref(false);
+const errorMessage = ref("");
+const editingId = ref(null);
+
 const filterData = ref({
   departemen: "",
   posisi: "",
@@ -44,10 +49,36 @@ const appliedFilterData = ref({
 });
 
 const opentambahPengguna = () => {
+  editingId.value = null;
+  formData.value = {
+    full_name: '',
+    phone_number: '',
+    email: '',
+    company_id: '',
+    department_id: '',
+    position_id: '',
+    work_status_id: '',
+    birth_date: '',
+    role: 'user',
+    kategori_pengguna: 'IMM'
+  };
   tambahPengguna.value = true;
 };
 
 const closeTambahPengguna = () => {
+  editingId.value = null;
+  formData.value = {
+    full_name: '',
+    phone_number: '',
+    email: '',
+    company_id: '',
+    department_id: '',
+    position_id: '',
+    work_status_id: '',
+    birth_date: '',
+    role: 'user',
+    kategori_pengguna: 'IMM'
+  };
   tambahPengguna.value = false;
 };
 
@@ -65,30 +96,231 @@ const applyFilter = () => {
   closeFilter();
 };
 
-const tableData = ref([
-  {
-    id: 1,
-    namaLengkap: "Budi Santoso",
-    noHandphone: "081234567890",
-    email:"budi@gmail.com",
-    namaPerusahaan: "PT Indominco Mandiri",
-    departemen: "Operasional",
-    posisi: "Supervisor",
-    status: "Karyawan",
-    role: "User",
-  },
-  {
-    id: 2,
-    namaLengkap: "Siti Nurhaliza",
-    noHandphone: "082345678901",
-    email:"siti@gmail.com",
-    namaPerusahaan: "PT Indominco Mandiri",
-    departemen: "Transport",
-    posisi: "Manager",
-    status: "Karyawan",
-    role: "User",
-  },
-]);
+const tableData = ref([]);
+
+// Master data untuk dropdown
+const companies = ref([]);
+const departments = ref([]);
+const positions = ref([]);
+const statuses = ref([]);
+const roles = [
+  { value: 'user', label: 'User' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'superadmin', label: 'Superadmin' }
+];
+
+// Form data untuk tambah pengguna
+const formData = ref({
+  full_name: '',
+  phone_number: '',
+  email: '',
+  company_id: '',
+  department_id: '',
+  position_id: '',
+  work_status_id: '',
+  birth_date: '',
+  role: 'user',
+  kategori_pengguna: 'IMM'
+});
+
+// Fetch master data
+const fetchMasterData = async () => {
+  try {
+    // Fetch companies
+    const companiesRes = await apiService.master.getCompanies();
+    if (companiesRes.data.status === 'success' || companiesRes.data.success) {
+      companies.value = companiesRes.data.payload;
+    }
+    
+    // Fetch departments
+    const departmentsRes = await apiService.master.getDepartments();
+    if (departmentsRes.data.status === 'success' || departmentsRes.data.success) {
+      departments.value = departmentsRes.data.payload;
+    }
+    
+    // Fetch positions
+    const positionsRes = await apiService.master.getPositions();
+    if (positionsRes.data.status === 'success' || positionsRes.data.success) {
+      positions.value = positionsRes.data.payload;
+    }
+    
+    // Fetch statuses
+    const statusesRes = await apiService.master.getStatuses();
+    if (statusesRes.data.status === 'success' || statusesRes.data.success) {
+      statuses.value = statusesRes.data.payload;
+    }
+  } catch (error) {
+    console.error('Error fetching master data:', error);
+  }
+};
+
+// Fetch data dari backend
+const fetchUsers = async () => {
+  isLoading.value = true;
+  errorMessage.value = "";
+  try {
+    const response = await apiService.users.getAll();
+    
+    if (response.data.status === 'success' || response.data.success) {
+      // Filter hanya user dengan kategori IMM
+      const allUsers = response.data.payload;
+      const immUsers = allUsers.filter(user => user.kategori_pengguna === 'IMM');
+      
+      tableData.value = immUsers.map(user => ({
+        id: user.id,
+        namaLengkap: user.full_name,
+        noHandphone: user.phone_number,
+        email: user.email,
+        namaPerusahaan: user.company?.nama_perusahaan || "-",
+        departemen: user.department?.nama_department || "-",
+        posisi: user.position?.nama_posisi || "-",
+        status: user.work_status?.nama_status || "-",
+        role: user.role,
+      }));
+    } else {
+      errorMessage.value = response.data.message || "Gagal mengambil data";
+    }
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal mengambil data pengguna";
+    
+    errorMessage.value = errorMsg;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Hapus pengguna (soft delete)
+const handleDeleteUsers = async () => {
+  if (selectedRowIds.value.length === 0) {
+    alert("Pilih pengguna yang ingin dihapus!");
+    return;
+  }
+  
+  if (!confirm(`Yakin ingin menghapus ${selectedRowIds.value.length} pengguna?`)) {
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = "";
+  let deletedCount = 0;
+  
+  try {
+    // Hapus satu per satu
+    for (const id of selectedRowIds.value) {
+      await apiService.users.delete(id);
+      deletedCount++;
+    }
+    
+    // Reset selection
+    selectedRowIds.value = [];
+    selectAllChecked.value = false;
+    
+    // Clear current data to force refresh
+    tableData.value = [];
+    
+    // Refresh data from backend
+    await fetchUsers();
+    
+    alert(`${deletedCount} pengguna berhasil dihapus`);
+  } catch (error) {
+    console.error("Error deleting users:", error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || "Gagal menghapus pengguna";
+    
+    errorMessage.value = errorMsg;
+    alert(`Error: ${errorMsg}\n\nBerhasil dihapus: ${deletedCount} dari ${selectedRowIds.value.length}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Submit tambah/edit pengguna
+const handleTambahPengguna = async () => {
+  // Validasi
+  if (!formData.value.full_name || !formData.value.phone_number || !formData.value.email) {
+    alert('Nama lengkap, nomor telepon, dan email wajib diisi!');
+    return;
+  }
+  
+  isLoading.value = true;
+  errorMessage.value = '';
+  
+  try {
+    let response;
+    
+    // Prepare payload - convert empty strings to null for optional fields
+    const payload = {
+      ...formData.value,
+      birth_date: formData.value.birth_date || null,
+      company_id: formData.value.company_id || null,
+      department_id: formData.value.department_id || null,
+      position_id: formData.value.position_id || null,
+      work_status_id: formData.value.work_status_id || null,
+    };
+    
+    if (editingId.value) {
+      // Mode edit
+      response = await apiService.users.update(editingId.value, payload);
+    } else {
+      // Mode tambah
+      response = await apiService.users.create(payload);
+    }
+    
+    if (response.data.status === 'success' || response.data.success) {
+      alert(editingId.value ? 'Pengguna berhasil diupdate' : 'Pengguna berhasil ditambahkan');
+      
+      // Reset form
+      editingId.value = null;
+      formData.value = {
+        full_name: '',
+        phone_number: '',
+        email: '',
+        company_id: '',
+        department_id: '',
+        position_id: '',
+        work_status_id: '',
+        birth_date: '',
+        role: 'user',
+        kategori_pengguna: 'IMM'
+      };
+      
+      // Close modal
+      closeTambahPengguna();
+      
+      // Refresh data
+      await fetchUsers();
+    } else {
+      errorMessage.value = response.data.message || 'Gagal menyimpan data pengguna';
+      alert(errorMessage.value);
+    }
+  } catch (error) {
+    console.error('Error saving user:', error);
+    
+    const errorMsg = error.response?.data?.detail 
+      || error.response?.data?.message 
+      || error.message 
+      || 'Gagal menyimpan data pengguna';
+    
+    errorMessage.value = errorMsg;
+    alert(`Error: ${errorMsg}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Load data saat component di-mount
+onMounted(() => {
+  fetchUsers();
+  fetchMasterData();
+});
 
 const selectRow = (rowId) => {
   const index = selectedRowIds.value.indexOf(rowId);
@@ -215,15 +447,36 @@ const sortByName = () => {
   currentPage.value = 1;
 };
 
-const editPengguna = (rowId) => {
-  const userData = tableData.value.find(row => row.id === rowId);
-  if (userData) {
-    localStorage.setItem('currentUserData', JSON.stringify(userData));
+const editPengguna = async (rowId) => {
+  try {
+    // Fetch user detail dari backend
+    const response = await apiService.users.getById(rowId);
+    
+    if (response.data.status === 'success' || response.data.success) {
+      const user = response.data.payload;
+      
+      // Populate form dengan data user
+      editingId.value = rowId;
+      formData.value = {
+        full_name: user.full_name || '',
+        phone_number: user.phone_number || '',
+        email: user.email || '',
+        company_id: user.company_id || '',
+        department_id: user.department_id || '',
+        position_id: user.position_id || '',
+        work_status_id: user.work_status_id || '',
+        birth_date: user.birth_date || '',
+        role: user.role || 'user',
+        kategori_pengguna: 'IMM'
+      };
+      
+      // Buka modal
+      tambahPengguna.value = true;
+    }
+  } catch (error) {
+    console.error('Error fetching user detail:', error);
+    alert('Gagal mengambil data pengguna');
   }
-  router.push({
-    name: 'EditDataPenggunaPT',
-    params: { id: rowId }
-  });
 };
 </script>
 
@@ -280,10 +533,13 @@ const editPengguna = (rowId) => {
                     class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
                   />
                   <input
+                    id="search-pengguna-pt"
+                    name="search"
                     v-model="searchQuery"
                     @input="currentPage = 1"
                     type="text"
                     placeholder="Cari nama..."
+                    aria-label="Cari pengguna PT"
                     class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -315,15 +571,17 @@ const editPengguna = (rowId) => {
 
                 <!-- Delete Button -->
                 <button
-                  :disabled="selectedRowIds.length === 0"
+                  @click="handleDeleteUsers"
+                  :disabled="selectedRowIds.length === 0 || isLoading"
                   class="flex items-center gap-2 px-3 py-2 rounded-md transition text-sm"
                   :class="
-                    selectedRowIds.length > 0
+                    selectedRowIds.length > 0 && !isLoading
                       ? 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
                       : 'bg-gray-100 text-gray-400 border border-gray-300 cursor-not-allowed'
                   "
                 >
                   <TrashIcon class="w-4 h-4" />
+                  <span v-if="selectedRowIds.length > 0">{{ isLoading ? 'Loading...' : 'Hapus' }}</span>
                 </button>
               </div>
             </div>
@@ -332,7 +590,26 @@ const editPengguna = (rowId) => {
             <div
               class="flex-1 flex flex-col gap-4 bg-gray-50 p-1 rounded-lg border border-gray-200 overflow-hidden"
             >
-              <div
+              <!-- Loading & Error Messages -->
+              <div v-if="isLoading" class="text-center py-8 text-gray-600">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2">Memuat data...</p>
+              </div>
+              
+              <div v-else-if="errorMessage" class="text-center py-8">
+                <p class="text-red-600">{{ errorMessage }}</p>
+                <button @click="fetchUsers" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                  Coba Lagi
+                </button>
+              </div>
+              
+              <div v-else-if="tableData.length === 0" class="text-center py-8 text-gray-600">
+                <p>Belum ada data pengguna</p>
+              </div>
+              
+              <div v-else
                 class="overflow-x-auto overflow-y-auto rounded-lg border bg-white max-h-105"
               >
                 <table class="w-full border-collapse">
@@ -378,6 +655,16 @@ const editPengguna = (rowId) => {
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-24"
                       >
                         No. Handphone
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Email
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Nama Perusahaan
                       </th>
                       <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
@@ -462,6 +749,16 @@ const editPengguna = (rowId) => {
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
                       >
+                        {{ row.email }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
+                        {{ row.namaPerusahaan }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
                         {{ row.departemen }}
                       </td>
                       <td
@@ -532,7 +829,7 @@ const editPengguna = (rowId) => {
                   class="flex justify-between items-center mb-1 pb-3 border-b border-gray-200"
                 >
                   <h2 class="text-lg md:text-xl font-semibold text-gray-900">
-                    Tambah Pengguna
+                    {{ editingId ? 'Edit Pengguna' : 'Tambah Pengguna' }}
                   </h2>
                   <button
                     @click="closeTambahPengguna"
@@ -548,11 +845,15 @@ const editPengguna = (rowId) => {
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label
+                      for="full_name"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Nama Lengkap</label
                     >
                     <div class="relative">
                       <input
+                        id="full_name"
+                        name="full_name"
+                        v-model="formData.full_name"
                         type="text"
                         placeholder="Masukkan nama"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
@@ -565,11 +866,15 @@ const editPengguna = (rowId) => {
 
                   <div>
                     <label
+                      for="phone_number"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Nomor Telepon</label
                     >
                     <div class="relative">
                       <input
+                        id="phone_number"
+                        name="phone_number"
+                        v-model="formData.phone_number"
                         type="text"
                         placeholder="081xxxxxxxx"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
@@ -585,12 +890,16 @@ const editPengguna = (rowId) => {
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
+                      for="email"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Email</label
                     >
                     <div class="relative">
                       <input
-                        type="text"
+                        id="email"
+                        name="email"
+                        v-model="formData.email"
+                        type="email"
                         placeholder="email@example.com"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                       />
@@ -602,14 +911,21 @@ const editPengguna = (rowId) => {
 
                   <div>
                     <label
+                      for="company_id"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Nama Perusahaan</label
                     >
                     <div class="relative">
                       <select
+                        id="company_id"
+                        name="company_id"
+                        v-model="formData.company_id"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
                       >
                         <option value="">Pilih nama perusahaan</option>
+                        <option v-for="company in companies" :key="company.id" :value="company.id">
+                          {{ company.nama_perusahaan }}
+                        </option>
                       </select>
                       <ChevronDownIcon
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -622,14 +938,21 @@ const editPengguna = (rowId) => {
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
+                      for="department_id"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Departemen</label
                     >
                     <div class="relative">
                       <select
+                        id="department_id"
+                        name="department_id"
+                        v-model="formData.department_id"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
                       >
                         <option value="">Pilih departemen</option>
+                        <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                          {{ dept.nama_department }}
+                        </option>
                       </select>
                       <ChevronDownIcon
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -638,14 +961,21 @@ const editPengguna = (rowId) => {
                   </div>
                   <div>
                     <label
+                      for="position_id"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Posisi</label
                     >
                     <div class="relative">
                       <select
+                        id="position_id"
+                        name="position_id"
+                        v-model="formData.position_id"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
                       >
                         <option value="">Pilih posisi</option>
+                        <option v-for="pos in positions" :key="pos.id" :value="pos.id">
+                          {{ pos.nama_posisi }}
+                        </option>
                       </select>
                       <ChevronDownIcon
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -658,14 +988,21 @@ const editPengguna = (rowId) => {
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label
+                      for="work_status_id"
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Status Pekerjaan</label
                     >
                     <div class="relative">
                       <select
+                        id="work_status_id"
+                        name="work_status_id"
+                        v-model="formData.work_status_id"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
                       >
                         <option value="">Pilih status pekerjaan</option>
+                        <option v-for="status in statuses" :key="status.id" :value="status.id">
+                          {{ status.nama_status }}
+                        </option>
                       </select>
                       <ChevronDownIcon
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -679,6 +1016,7 @@ const editPengguna = (rowId) => {
                     >
                     <input
                       type="date"
+                      v-model="formData.birth_date"
                       class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
                     />
                   </div>
@@ -691,9 +1029,13 @@ const editPengguna = (rowId) => {
                     >
                     <div class="relative">
                       <select
+                        v-model="formData.role"
                         class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm appearance-none"
                       >
                         <option value="">Pilih role</option>
+                        <option v-for="role in roles" :key="role.value" :value="role.value">
+                          {{ role.label }}
+                        </option>
                       </select>
                       <ChevronDownIcon
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
@@ -704,9 +1046,11 @@ const editPengguna = (rowId) => {
 
                 <div class="flex justify-end gap-3 mt-6">
                   <button
-                    class="px-6 md:px-6 py-2 text-sm md:text-base bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular"
+                    @click="handleTambahPengguna"
+                    :disabled="isLoading"
+                    class="px-6 md:px-6 py-2 text-sm md:text-base bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition font-regular disabled:opacity-50"
                   >
-                    Tambah Pengguna
+                    {{ isLoading ? 'Loading...' : (editingId ? 'Update Pengguna' : 'Tambah Pengguna') }}
                   </button>
                   <button
                     @click="closeTambahPengguna"
@@ -750,12 +1094,18 @@ const editPengguna = (rowId) => {
                   >
                   <div class="relative">
                     <select
+                    <select
                       v-model="filterData.namaPerusahaan"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Perusahaan</option>
                     </select>
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Perusahaan</option>
+                    </select>
                     <ChevronDownIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
@@ -769,12 +1119,18 @@ const editPengguna = (rowId) => {
                   >
                   <div class="relative">
                     <select
+                    <select
                       v-model="filterData.departemen"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Departemen</option>
                     </select>
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Departemen</option>
+                    </select>
                     <ChevronDownIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
@@ -788,12 +1144,18 @@ const editPengguna = (rowId) => {
                   >
                   <div class="relative">
                     <select
+                    <select
                       v-model="filterData.posisi"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Posisi Kerja</option>
                     </select>
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Posisi Kerja</option>
+                    </select>
                     <ChevronDownIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
@@ -807,12 +1169,18 @@ const editPengguna = (rowId) => {
                   >
                   <div class="relative">
                     <select
+                    <select
                       v-model="filterData.status"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Status Kerja</option>
                     </select>
+                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
+                    >
+                      <option value="">Pilih Status Kerja</option>
+                    </select>
                     <ChevronDownIcon
+                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>

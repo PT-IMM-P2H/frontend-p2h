@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
 import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
 import { 
@@ -9,15 +11,15 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon 
 } from "@heroicons/vue/24/solid";
-import api from "@/services/api";
+import { api } from "../../services/api";
 
 const router = useRouter();
 
 // --- STATE MANAGEMENT ---
-const searchInput = ref("P.309");
-const vehicleData = ref<any>(null);
+const searchInput = ref("");
+const vehicleData = ref(null);
 const questions = ref([]);
-const answers = ref<Record<string, { status: string; keterangan: string }>>({});
+const answers = ref({});
 const loading = ref(false);
 const isSubmitting = ref(false);
 
@@ -33,11 +35,11 @@ const handleSearchVehicle = async () => {
   try {
     loading.value = true;
     const response = await api.get(`/vehicles/lambung/${searchInput.value}`);
-    vehicleData.value = response.data.payload.vehicle;
+    vehicleData.value = response.data.payload;
     
     // Setelah unit ditemukan, otomatis ambil checklist-nya
-    await fetchChecklist(vehicleData.value.vehicle_type);
-  } catch (error: any) {
+    await fetchChecklist(vehicleData.value.jenis_kendaraan);
+  } catch (error) {
     alert(error.response?.data?.detail || "Nomor lambung tidak ditemukan");
     vehicleData.value = null;
     questions.value = [];
@@ -47,17 +49,33 @@ const handleSearchVehicle = async () => {
 };
 
 // 2. Mengambil Daftar Pertanyaan Checklist
-const fetchChecklist = async (type: string) => {
+const fetchChecklist = async (vehicleType) => {
   try {
-    const response = await api.get(`/p2h/checklist/${type}`);
-    questions.value = response.data.payload;
+    const response = await api.get('/p2h/checklist-items');
+    
+    // Filter pertanyaan berdasarkan vehicle_tags yang cocok dengan jenis kendaraan
+    const allQuestions = response.data.payload;
+    questions.value = allQuestions.filter(q => 
+      q.vehicle_tags.includes(vehicleType)
+    );
+    
+    // Parse options format "jawaban|pilihan" dan inisialisasi jawaban
+    questions.value = questions.value.map(q => ({
+      ...q,
+      pertanyaan: q.item_name, // Map item_name ke pertanyaan untuk kompatibilitas template
+      options: q.options.map(opt => {
+        const [jawaban, pilihan] = opt.includes('|') ? opt.split('|') : [opt, 'Normal'];
+        return { jawaban, pilihan };
+      })
+    }));
     
     // Inisialisasi jawaban default: "Normal"
-    questions.value.forEach((q: any) => {
+    questions.value.forEach((q) => {
       answers.value[q.id] = { status: "Normal", keterangan: "" };
     });
   } catch (error) {
     console.error("Gagal memuat checklist", error);
+    alert("Gagal memuat checklist: " + (error.response?.data?.detail || error.message));
   }
 };
 
@@ -89,9 +107,9 @@ const handleSubmitReport = async () => {
 
     const response = await api.post("/p2h/submit", payload);
     alert(response.data.message || "Laporan P2H Berhasil Dikirim!");
-    router.push("/main"); 
+    router.push("/"); 
     
-  } catch (error: any) {
+  } catch (error) {
     alert("Error: " + (error.response?.data?.detail || "Gagal mengirim laporan"));
   } finally {
     isSubmitting.value = false;
@@ -100,7 +118,7 @@ const handleSubmitReport = async () => {
 
 // Mengelompokkan item berdasarkan Section
 const groupedQuestions = computed(() => {
-  return questions.value.reduce((acc: any, obj: any) => {
+  return questions.value.reduce((acc, obj) => {
     const key = obj.section_name;
     if (!acc[key]) acc[key] = [];
     acc[key].push(obj);
@@ -108,12 +126,12 @@ const groupedQuestions = computed(() => {
   }, {});
 });
 
-onMounted(() => {
-  if (searchInput.value) handleSearchVehicle();
-});
+// Removed auto-load to prevent 401 error on page load
+// User must click "Cari" button to search for vehicle
 </script>
 
 <template>
+  <div class="min-h-screen flex flex-col font-['Montserrat'] bg-gray-50">
   <div class="min-h-screen flex flex-col font-['Montserrat'] bg-gray-50">
     <NavBar />
 
@@ -131,6 +149,7 @@ onMounted(() => {
             Mohon mengisi informasi keadaan kendaraan hari ini sebelum anda bekerja atau sebelum memakai kendaraan di area PT Indominco Mandiri.
           </p>
         </div>
+
 
         <div class="p-8 md:p-10 bg-white rounded-lg shadow-md w-full mx-auto">
           <h2 class="text-2xl font-bold mb-4 text-gray-900">
@@ -157,6 +176,7 @@ onMounted(() => {
             </div>
             
             <div class="mt-4">
+            <div class="mt-4">
               <div class="inline-block px-4 py-2 text-base font-bold rounded-full mb-3" style="background-color: #F7E19C; color: #8B6F47;">
                 Abnormal
               </div>
@@ -165,6 +185,7 @@ onMounted(() => {
               </p>
             </div>
             
+            <div class="mt-4">
             <div class="mt-4">
               <div class="inline-block px-4 py-2 text-base font-bold rounded-full mb-3" style="background-color: #FFA0A0; color: #8B3A3A;">
                 Warning
@@ -180,7 +201,9 @@ onMounted(() => {
           <h2 class="text-2xl font-bold mb-4 text-gray-900 border-b-4 border-purple-500 inline-block pb-1">Jenis Kendaraan</h2>
           
           <div class="flex gap-2 mb-6 mt-4">
-            <input 
+            <input
+              id="search_lambung"
+              name="search_lambung"
               v-model="searchInput"
               @keyup.enter="handleSearchVehicle"
               placeholder="Masukkan nomor lambung (P.309)" 
@@ -200,8 +223,8 @@ onMounted(() => {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm text-green-900">
               <p><strong>Nomor lambung :</strong> {{ vehicleData.no_lambung }}</p>
               <p><strong>Merek Kendaraan :</strong> {{ vehicleData.merk }}</p>
-              <p><strong>Tipe Kendaraan :</strong> {{ vehicleData.vehicle_type }}</p>
-              <p><strong>Plat Kendaraan :</strong> {{ vehicleData.plat_nomor }}</p>
+              <p><strong>Tipe Kendaraan :</strong> {{ vehicleData.jenis_kendaraan }}</p>
+              <p><strong>Plat Kendaraan :</strong> {{ vehicleData.no_polisi }}</p>
             </div>
           </div>
         </div>
@@ -216,29 +239,33 @@ onMounted(() => {
             <div class="flex flex-col gap-8">
               <div v-for="q in items" :key="q.id" class="group">
                 <p class="text-gray-900 font-bold text-lg mb-4 group-hover:text-purple-600 transition-colors">
-                  {{ q.item_name }}
+                  {{ q.pertanyaan }}
                 </p>
                 
                 <div class="flex flex-wrap gap-6 mb-4">
                   <label 
-                    v-for="opt in q.options" 
-                    :key="opt" 
+                    v-for="opt in ['Normal', 'Abnormal', 'Warning']" 
+                    :key="opt"
+                    :for="`status_${q.id}_${opt}`"
                     class="flex items-center gap-3 cursor-pointer p-3 border-2 rounded-xl transition-all"
                     :class="answers[q.id].status === opt ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-100' : 'border-gray-100'"
                   >
-                    <input 
+                    <input
+                      :id="`status_${q.id}_${opt}`"
+                      :name="`status_${q.id}`"
                       type="radio" 
-                      :name="'status-'+q.id" 
                       :value="opt" 
                       v-model="answers[q.id].status"
                       class="w-5 h-5 accent-purple-600"
-                    >
+                    />
                     <span class="font-bold text-gray-700">{{ opt }}</span>
                   </label>
                 </div>
 
                 <div v-if="answers[q.id].status !== 'Normal' && answers[q.id].status !== 'Baik'">
-                  <textarea 
+                  <textarea
+                    :id="`keterangan_${q.id}`"
+                    :name="`keterangan_${q.id}`"
                     v-model="answers[q.id].keterangan"
                     placeholder="Jelaskan detail kerusakan di sini..."
                     class="w-full p-4 border-2 border-red-100 rounded-xl bg-red-50 focus:border-red-400 outline-none text-sm font-medium"
@@ -267,6 +294,16 @@ onMounted(() => {
     <Footer />
   </div>
 </template>
+
+<style scoped>
+/* Transisi halus saat keterangan muncul */
+.slide-enter-active { transition: all 0.3s ease-out; }
+.slide-enter-from { opacity: 0; transform: translateY(-10px); }
+
+input[type="radio"] {
+  cursor: pointer;
+}
+</style>
 
 <style scoped>
 /* Transisi halus saat keterangan muncul */

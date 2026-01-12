@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import Aside from "../bar/aside.vue";
 import HeaderAdmin from "../bar/header_admin.vue";
 import {
@@ -10,11 +10,15 @@ import {
   PlusIcon,
 } from "@heroicons/vue/24/outline";
 import { PencilIcon, ChevronDownIcon } from "@heroicons/vue/24/solid";
+import { api } from "../../services/api";
 
 const tambahPertanyaan = ref(false);
 const editPertanyaan = ref(false);
 const editingPertanyaan = ref(null);
 const selectedRows = ref([]);
+const loading = ref(false);
+const confirmDelete = ref(false);
+const pertanyaanToDelete = ref(null);
 
 const formPertanyaan = ref("");
 
@@ -26,57 +30,7 @@ const formJawabanList = ref([
   },
 ]);
 
-const pertanyaanList = ref([
-  {
-    id: 1,
-    pertanyaan: "Apakah anda bekerja shift / non-shift?",
-    vehicleTypes: {
-      lightVehicle: true,
-      electricVehicle: true,
-      doubleCabin: false,
-      singleCabin: false,
-      bus: false,
-      ambulance: false,
-      fireTruck: false,
-      komando: false,
-      truckSampah: false,
-    },
-    jawabanList: [
-      {
-        id: 1,
-        jawaban: "Shift 1",
-        pilihan: "shift1",
-      },
-      {
-        id: 2,
-        jawaban: "Shift 2",
-        pilihan: "shift2",
-      },
-    ],
-  },
-  {
-    id: 2,
-    pertanyaan: "Jokowi penjahat negri",
-    vehicleTypes: {
-      lightVehicle: false,
-      electricVehicle: false,
-      doubleCabin: false,
-      singleCabin: false,
-      bus: false,
-      ambulance: false,
-      fireTruck: false,
-      komando: false,
-      truckSampah: false,
-    },
-    jawabanList: [
-      {
-        id: 1,
-        jawaban: "Setiap 2 jam kerja",
-        pilihan: "Sesuai jadwal yang ditentukan",
-      },
-    ],
-  },
-]);
+const pertanyaanList = ref([]);
 
 const openEditPertanyaan = (pertanyaan) => {
   editingPertanyaan.value = JSON.parse(JSON.stringify(pertanyaan));
@@ -103,28 +57,41 @@ const closeEditPertanyaan = () => {
   }, {});
 };
 
-const simpanEditPertanyaan = () => {
+const simpanEditPertanyaan = async () => {
   if (editingPertanyaan.value && formPertanyaan.value.trim()) {
     const jawabanList = formJawabanList.value.filter(
       (form) => form.jawaban && form.pilihan
     );
 
     if (jawabanList.length > 0) {
-      const index = pertanyaanList.value.findIndex(
-        (p) => p.id === editingPertanyaan.value.id
-      );
-      if (index !== -1) {
-        pertanyaanList.value[index] = {
-          id: editingPertanyaan.value.id,
-          pertanyaan: formPertanyaan.value,
-          vehicleTypes: JSON.parse(JSON.stringify(vehicleTypes.value)),
-          jawabanList: jawabanList.map((form, idx) => ({
-            id: idx + 1,
-            jawaban: form.jawaban,
-            pilihan: form.pilihan,
-          })),
+      try {
+        loading.value = true;
+        
+        // Convert vehicleTypes object ke array tags
+        const selectedTags = vehicleList
+          .filter(v => vehicleTypes.value[v.id])
+          .map(v => v.tag);
+        
+        const payload = {
+          question_text: formPertanyaan.value,
+          section_name: editingPertanyaan.value.section_name || "UMUM",
+          vehicle_tags: selectedTags,
+          applicable_shifts: ["Shift 1", "Shift 2"],
+          options: jawabanList.map(j => `${j.jawaban}|${j.pilihan}`),
+          item_order: editingPertanyaan.value.item_order || 1
         };
-        closeEditPertanyaan();
+        
+        const response = await api.put(`/p2h/checklist/${editingPertanyaan.value.id}`, payload);
+        
+        if (response.data.status === "success") {
+          await fetchPertanyaan(); // Reload data
+          closeEditPertanyaan();
+        }
+      } catch (error) {
+        console.error("Error updating pertanyaan:", error);
+        alert("Gagal mengupdate pertanyaan: " + (error.response?.data?.detail || error.message));
+      } finally {
+        loading.value = false;
       }
     }
   }
@@ -151,15 +118,15 @@ const closetambahPertanyaan = () => {
 };
 
 const vehicleList = [
-  { id: "lightVehicle", label: "Light vehicle" },
-  { id: "electricVehicle", label: "Electric vehicle" },
-  { id: "doubleCabin", label: "Double cabin" },
-  { id: "singleCabin", label: "Single cabin" },
-  { id: "bus", label: "Bus" },
-  { id: "ambulance", label: "Ambulance" },
-  { id: "fireTruck", label: "Fire truck" },
-  { id: "komando", label: "Komando" },
-  { id: "truckSampah", label: "Truk sampah" },
+  { id: "lightVehicle", label: "Light vehicle", tag: "Light Vehicle" },
+  { id: "electricVehicle", label: "Electric vehicle", tag: "Electric Vehicle" },
+  { id: "doubleCabin", label: "Double cabin", tag: "Double Cabin" },
+  { id: "singleCabin", label: "Single cabin", tag: "Single Cabin" },
+  { id: "bus", label: "Bus", tag: "Bus" },
+  { id: "ambulance", label: "Ambulance", tag: "Ambulance" },
+  { id: "fireTruck", label: "Fire truck", tag: "Fire Truck" },
+  { id: "komando", label: "Komando", tag: "Komando" },
+  { id: "truckSampah", label: "Truk sampah", tag: "Truk Sampah" },
 ];
 
 const vehicleTypes = ref(
@@ -169,11 +136,72 @@ const vehicleTypes = ref(
   }, {})
 );
 
-const hapusPertanyaan = () => {
-  if (selectedRows.value.length > 0) {
-    // Logika hapus data
-    selectedRows.value = [];
+// Fetch data dari backend
+const fetchPertanyaan = async () => {
+  try {
+    loading.value = true;
+    const response = await api.get("/p2h/checklist");
+    if (response.data.status === "success") {
+      // Transform backend data ke format frontend
+      pertanyaanList.value = response.data.payload.map(item => ({
+        id: item.id,
+        pertanyaan: item.item_name,
+        section_name: item.section_name,
+        vehicleTypes: vehicleList.reduce((acc, vehicle) => {
+          acc[vehicle.id] = item.vehicle_tags.includes(vehicle.tag);
+          return acc;
+        }, {}),
+        jawabanList: item.options.map((opt, idx) => {
+          const [jawaban, pilihan] = opt.includes('|') ? opt.split('|') : [opt, ''];
+          return {
+            id: idx + 1,
+            jawaban: jawaban,
+            pilihan: pilihan
+          };
+        }),
+        item_order: item.item_order
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching pertanyaan:", error);
+  } finally {
+    loading.value = false;
   }
+};
+
+// Load data saat component mounted
+onMounted(() => {
+  fetchPertanyaan();
+});
+
+const hapusPertanyaan = (pertanyaan) => {
+  pertanyaanToDelete.value = pertanyaan;
+  confirmDelete.value = true;
+};
+
+const konfirmasiHapus = async () => {
+  if (pertanyaanToDelete.value) {
+    try {
+      loading.value = true;
+      const response = await api.delete(`/p2h/checklist/${pertanyaanToDelete.value.id}`);
+      
+      if (response.data.status === "success") {
+        await fetchPertanyaan(); // Reload data
+        confirmDelete.value = false;
+        pertanyaanToDelete.value = null;
+      }
+    } catch (error) {
+      console.error("Error deleting pertanyaan:", error);
+      alert("Gagal menghapus pertanyaan: " + (error.response?.data?.detail || error.message));
+    } finally {
+      loading.value = false;
+    }
+  }
+};
+
+const batalHapus = () => {
+  confirmDelete.value = false;
+  pertanyaanToDelete.value = null;
 };
 
 const tambahKontainerPertanyaan = () => {
@@ -185,25 +213,42 @@ const tambahKontainerPertanyaan = () => {
   });
 };
 
-const simpanPertanyaan = () => {
+const simpanPertanyaan = async () => {
   if (formPertanyaan.value.trim()) {
     const jawabanList = formJawabanList.value.filter(
       (form) => form.jawaban && form.pilihan
     );
 
     if (jawabanList.length > 0) {
-      const newPertanyaan = {
-        id: Math.max(...pertanyaanList.value.map((p) => p.id), 0) + 1,
-        pertanyaan: formPertanyaan.value,
-        vehicleTypes: JSON.parse(JSON.stringify(vehicleTypes.value)),
-        jawabanList: jawabanList.map((form, index) => ({
-          id: index + 1,
-          jawaban: form.jawaban,
-          pilihan: form.pilihan,
-        })),
-      };
-      pertanyaanList.value.push(newPertanyaan);
-      closetambahPertanyaan();
+      try {
+        loading.value = true;
+        
+        // Convert vehicleTypes object ke array tags
+        const selectedTags = vehicleList
+          .filter(v => vehicleTypes.value[v.id])
+          .map(v => v.tag);
+        
+        const payload = {
+          question_text: formPertanyaan.value,
+          section_name: "UMUM", // Default section, bisa ditambahkan input
+          vehicle_tags: selectedTags,
+          applicable_shifts: ["Shift 1", "Shift 2"], // Default, bisa ditambahkan input
+          options: jawabanList.map(j => `${j.jawaban}|${j.pilihan}`),
+          item_order: pertanyaanList.value.length + 1
+        };
+        
+        const response = await api.post("/p2h/checklist", payload);
+        
+        if (response.data.status === "success") {
+          await fetchPertanyaan(); // Reload data
+          closetambahPertanyaan();
+        }
+      } catch (error) {
+        console.error("Error saving pertanyaan:", error);
+        alert("Gagal menyimpan pertanyaan: " + (error.response?.data?.detail || error.message));
+      } finally {
+        loading.value = false;
+      }
     }
   }
 };
@@ -215,6 +260,9 @@ const simpanPertanyaan = () => {
     <div class="flex flex-1 min-h-0 ml-62 overflow-hidden">
       <Aside />
 
+      <!-- CONTENT -->
+      <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <HeaderAdmin class="shrink-0" />
       <!-- CONTENT -->
       <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
         <HeaderAdmin class="shrink-0" />
@@ -254,57 +302,42 @@ const simpanPertanyaan = () => {
                   :key="pertanyaan.id"
                   class="flex flex-col w-full bg-white rounded-lg border border-gray-200 shrink-0"
                 >
-                  <div class="flex justify-end items-center gap-3 px-4 pt-4">
-                    <button
-                      @click="openEditPertanyaan(pertanyaan)"
-                      class="px-4 md:px-8 py-2 text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition"
-                    >
-                      Edit
-                    </button>
-                  </div>
-
                   <div class="px-4 pb-4">
                     <div>
-                      <label
-                        class="block text-lg font-bold text-black mb-2 mt-4"
-                        >Tipe kendaraan</label
-                      >
-                      <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
-                        <div
-                          v-for="vehicle in vehicleList"
-                          :key="vehicle.id"
-                          class="flex items-center gap-2 p-2 border rounded-xl transition cursor-not-allowed"
-                          :class="
-                            pertanyaan.vehicleTypes[vehicle.id]
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-[#a9a9a9] bg-gray-100'
-                          "
+                      <div class="flex justify-between items-center mb-2 mt-4">
+                        <label class="text-lg font-bold text-black"
+                          >Tipe kendaraan</label
                         >
-                          <div class="relative w-5 h-5">
-                            <input
-                              disabled
-                              type="checkbox"
-                              :checked="pertanyaan.vehicleTypes[vehicle.id]"
-                              :id="vehicle.id"
-                              class="w-5 h-5 cursor-not-allowed rounded-md border-2 appearance-none bg-gray-100 border-gray-400 checked:bg-blue-500 checked:border-blue-500"
-                              style="
-                                appearance: none;
-                                -webkit-appearance: none;
-                                -moz-appearance: none;
-                              "
-                            />
-                            <CheckIcon
-                              v-if="pertanyaan.vehicleTypes[vehicle.id]"
-                              class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
-                            />
-                          </div>
-                          <label
-                            :for="vehicle.id"
-                            class="text-sm text-gray-400 cursor-pointer"
+                        <div class="flex items-center gap-3">
+                          <button
+                            @click="openEditPertanyaan(pertanyaan)"
+                            class="px-4 md:px-8 py-2 text-sm bg-linear-to-r from-[#A90CF8] to-[#9600E1] text-white rounded-xl hover:opacity-90 transition"
                           >
-                            {{ vehicle.label }}
-                          </label>
+                            Edit
+                          </button>
+                          <button
+                            @click="hapusPertanyaan(pertanyaan)"
+                            class="px-4 md:px-8 py-2 text-sm bg-red-600 text-white rounded-xl hover:bg-red-700 transition"
+                          >
+                            Hapus
+                          </button>
                         </div>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span
+                          v-for="vehicle in vehicleList.filter(v => pertanyaan.vehicleTypes[v.id])"
+                          :key="vehicle.id"
+                          class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+                        >
+                          <CheckIcon class="w-4 h-4" />
+                          {{ vehicle.label }}
+                        </span>
+                        <span
+                          v-if="vehicleList.filter(v => pertanyaan.vehicleTypes[v.id]).length === 0"
+                          class="text-sm text-gray-400 italic"
+                        >
+                          Tidak ada tipe kendaraan dipilih
+                        </span>
                       </div>
                     </div>
 
@@ -392,6 +425,7 @@ const simpanPertanyaan = () => {
                     <div
                       v-for="vehicle in vehicleList"
                       :key="vehicle.id"
+                      @click="vehicleTypes[vehicle.id] = !vehicleTypes[vehicle.id]"
                       class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer"
                       :class="
                         vehicleTypes[vehicle.id]
@@ -485,7 +519,7 @@ const simpanPertanyaan = () => {
                             v-model="form.pilihan"
                             class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md text-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
                           >
-                            <option value="">Pilih jawaban</option>
+                            <option value="">Pilih jawaban</option><option value="Normal">Normal</option><option value="Abnormal">Abnormal</option><option value="Warning">Warning</option>
                           </select>
                           <ChevronDownIcon
                             class="absolute right-3 top-2.5 w-5 h-5 text-[#b2b2b2] pointer-events-none"
@@ -548,16 +582,6 @@ const simpanPertanyaan = () => {
                   </button>
                 </div>
 
-                <div class="flex justify-center mt-6">
-                  <button
-                    @click="hapusKolomPertanyaan"
-                    class="flex items-center gap-2 px-20 py-2 text-sm border border-red-300 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition font-regular"
-                  >
-                    <TrashIcon class="w-5 h-5" />
-                    Hapus Kolom Pertanyaan
-                  </button>
-                </div>
-
                 <div>
                   <label
                     class="block text-base font-medium text-black mb-2 mt-4"
@@ -567,6 +591,7 @@ const simpanPertanyaan = () => {
                     <div
                       v-for="vehicle in vehicleList"
                       :key="vehicle.id"
+                      @click="vehicleTypes[vehicle.id] = !vehicleTypes[vehicle.id]"
                       class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer"
                       :class="
                         vehicleTypes[vehicle.id]
@@ -660,7 +685,7 @@ const simpanPertanyaan = () => {
                             v-model="form.pilihan"
                             class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md text-sm focus:outline-none focus:border-[#A90CF8] appearance-none"
                           >
-                            <option value="">Pilih jawaban</option>
+                            <option value="">Pilih jawaban</option><option value="Normal">Normal</option><option value="Abnormal">Abnormal</option><option value="Warning">Warning</option>
                           </select>
                           <ChevronDownIcon
                             class="absolute right-3 top-2.5 w-5 h-5 text-[#b2b2b2] pointer-events-none"
@@ -694,6 +719,55 @@ const simpanPertanyaan = () => {
                     class="px-6 md:px-6 py-2 text-sm md:text-base border border-gray-300 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular"
                   >
                     Batal
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal Konfirmasi Hapus -->
+            <div
+              v-if="confirmDelete"
+              class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            >
+              <div
+                class="bg-white rounded-lg w-full max-w-md shadow-lg p-6"
+              >
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <TrashIcon class="w-6 h-6 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                      Konfirmasi Hapus
+                    </h3>
+                  </div>
+                </div>
+
+                <div class="mb-6">
+                  <p class="text-gray-700">
+                    Apakah Anda yakin ingin menghapus pertanyaan:
+                  </p>
+                  <p class="font-semibold text-gray-900 mt-2">
+                    "{{ pertanyaanToDelete?.pertanyaan }}"
+                  </p>
+                  <p class="text-sm text-red-600 mt-2">
+                    Tindakan ini tidak dapat dibatalkan.
+                  </p>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                  <button
+                    @click="batalHapus"
+                    class="px-6 py-2 text-sm border border-gray-300 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition font-regular"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    @click="konfirmasiHapus"
+                    :disabled="loading"
+                    class="px-6 py-2 text-sm bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-regular disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {{ loading ? 'Menghapus...' : 'Iya, Hapus' }}
                   </button>
                 </div>
               </div>

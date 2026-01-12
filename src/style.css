@@ -131,6 +131,30 @@ input[type="datetime-local"]::-webkit-clear-button {
   display: none;
 }
 
+
+/* Date Input Styling */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color: #333333;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.3);
+  opacity: 1;
+  transform: scale(1.5);
+  margin-right: 8px;
+}
+
+input[type="date"]::-webkit-clear-button,
+input[type="time"]::-webkit-clear-button,
+input[type="datetime-local"]::-webkit-clear-button {
+  display: none;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

@@ -514,7 +514,7 @@ onMounted(() => {
 
         <!-- Konten Utama -->
         <main
-          class="bg-[#EFEFEF] flex-1 flex items-start justify-center overflow-y-auto p-1.5 sm:p-2.5 md:p-3 lg:p-4"
+          class="bg-[#EFEFEF] flex-1 flex items-start justify-center overflow-y-auto p-1 sm:p-1 md:p-2 lg:p-1"
         >
           <div class="w-full p-2">
             <!-- 6 Konten Sejajar -->
@@ -599,7 +599,7 @@ onMounted(() => {
             </div>
 
             <!-- Konten kedua -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 md:gap-4 mt-2 sm:mt-3 md:mt-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 md:gap-2 mt-2 sm:mt-3 md:mt-4">
               <div class="flex flex-col w-full gap-2 sm:gap-3">
                 <!-- Konten Kiri -->
                 <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
@@ -732,9 +732,9 @@ onMounted(() => {
                 </div>
 
                 <!-- Grafik tahunan -->
-                <div class="mt-4">
+                <div class="mt-5">
                   <div
-                    class="w-full bg-linear-to-br from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
+                    class="w-full bg-linear-to-br h-full from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
                   >
                     <div class="flex items-center justify-between mb-6">
                       <div>

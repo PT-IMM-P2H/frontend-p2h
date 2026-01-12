@@ -1,4 +1,6 @@
 <script setup>
+import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
 import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
 import { InformationCircleIcon } from "@heroicons/vue/24/solid";

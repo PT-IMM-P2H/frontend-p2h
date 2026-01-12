@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, defineProps } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ChevronRightIcon, DocumentIcon, Square3Stack3DIcon, EyeIcon, UsersIcon, QuestionMarkCircleIcon, Cog6ToothIcon, UserIcon, BuildingOfficeIcon, MapIcon, BriefcaseIcon, RectangleStackIcon, TruckIcon,InboxStackIcon, ArrowRightStartOnRectangleIcon, XMarkIcon, Bars3Icon, ChevronDownIcon, CheckIcon } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
@@ -16,6 +17,7 @@ const props = defineProps({
 
 const router = useRouter()
 const route = useRoute()
+const { locale } = useI18n()
 const activeMenu = ref('dashboard')
 const expandedMenu = ref(new Set())
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -198,8 +200,8 @@ watch(() => route.path, () => {
 
 const handleLanguageSelect = (languageCode) => {
   selectedLanguage.value = languageCode
+  locale.value = languageCode
   isLanguageDropdownOpen.value = false
-  // TODO: Emit language change event or update global language state
 }
 
 const toggleLanguageDropdown = () => {

@@ -6,7 +6,7 @@ import { onMounted, ref, nextTick, watch, provide } from "vue";
 import Chart from "chart.js/auto";
 import { useI18n } from "vue-i18n";
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 
 let chartInstance = null;
 
@@ -526,7 +526,7 @@ onMounted(() => {
                 <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
                 <div class="flex flex-col flex-1 min-w-0">
                   <p class="text-xs font-regular text-gray-500 truncate">
-                    Total unit kendaraan
+                    {{ t('dashboard.totalVehicles') }}
                   </p>
                   <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalVehicles }}</h3>
                 </div>
@@ -539,7 +539,7 @@ onMounted(() => {
                 <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
                 <div class="flex flex-col flex-1 min-w-0">
                   <p class="text-xs font-regular text-gray-500 truncate">
-                    Total status normal
+                    {{ t('dashboard.totalNormal') }}
                   </p>
                   <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalNormal }}</h3>
                 </div>
@@ -552,7 +552,7 @@ onMounted(() => {
                 <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
                 <div class="flex flex-col flex-1 min-w-0">
                   <p class="text-xs font-regular text-gray-500 truncate">
-                    Total status abnormal
+                    {{ t('dashboard.totalAbnormal') }}
                   </p>
                   <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalAbnormal }}</h3>
                 </div>
@@ -565,7 +565,7 @@ onMounted(() => {
                 <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
                 <div class="flex flex-col flex-1 min-w-0">
                   <p class="text-xs font-regular text-gray-500 truncate">
-                    Total status warning
+                    {{ t('dashboard.totalWarning') }}
                   </p>
                   <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalWarning }}</h3>
                 </div>
@@ -578,7 +578,7 @@ onMounted(() => {
                 <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
                 <div class="flex flex-col flex-1 min-w-0">
                   <p class="text-xs font-regular text-gray-500 truncate">
-                    Total unit sudah P2H
+                    {{ t('dashboard.totalCompletedP2H') }}
                   </p>
                   <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalCompletedP2H }}</h3>
                 </div>
@@ -591,7 +591,7 @@ onMounted(() => {
                 <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
                 <div class="flex flex-col flex-1 min-w-0">
                   <p class="text-xs font-regular text-gray-500 truncate">
-                    Total unit belum P2H
+                    {{ t('dashboard.totalPendingP2H') }}
                   </p>
                   <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalPendingP2H }}</h3>
                 </div>
@@ -604,13 +604,13 @@ onMounted(() => {
                 <!-- Konten Kiri -->
                 <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
                   <h2 class="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-2 sm:mb-3 md:mb-4">
-                    Filter hari
+                    {{ t('dashboard.filterDay') }}
                   </h2>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <div>
                       <label
                         class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2"
-                        >Tanggal Mulai</label
+                        >{{ t('dashboard.startDate') }}</label
                       >
                       <input
                         v-model="a"
@@ -621,7 +621,7 @@ onMounted(() => {
                     <div>
                       <label
                         class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2"
-                        >Tanggal Akhir</label
+                        >{{ t('dashboard.endDate') }}</label
                       >
                       <input
                         v-model="u"
@@ -635,13 +635,13 @@ onMounted(() => {
                       type="button"
                       class="w-full p-1.5 sm:p-2 bg-indigo-600 text-white text-xs sm:text-sm font-semibold rounded-md hover:bg-indigo-700 transition-colors duration-200"
                     >
-                      Terapkan Filter
+                      {{ t('dashboard.applyFilter') }}
                     </button>
                     <button
                       type="button"
                       class="w-full p-1.5 sm:p-2 bg-gray-300 text-gray-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-gray-400 transition-colors duration-200"
                     >
-                      Reset Filter
+                      {{ t('dashboard.resetFilter') }}
                     </button>
                   </div>
                 </div>
@@ -653,7 +653,7 @@ onMounted(() => {
                     class="w-full bg-white rounded-lg shadow-md p-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
                   >
                     <p class="text-sm font-semibold text-gray-800">
-                      {{ selectedVehicleType || "Tipe Kendaraan" }}
+                      {{ selectedVehicleType || t('dashboard.vehicleType') }}
                     </p>
                     <ChevronDownIcon 
                       :class="['w-5 h-5 text-gray-800 transition-transform duration-200', isVehicleTypeOpen && 'rotate-180']" 
@@ -680,11 +680,11 @@ onMounted(() => {
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-md font-bold text-gray-800 mb-4">
-                      Status {{ selectedVehicleType || 'Tipe Kendaraan' }}
+                      {{ t('dashboard.statusVehicleType') }} {{ selectedVehicleType || t('dashboard.vehicleType') }}
                     </h3>
                     <div class="h-80 w-full">
                       <div v-if="!selectedVehicleType" class="h-full flex items-center justify-center">
-                        <p class="text-gray-400 text-center font-medium">Pilih filter untuk menampilkan</p>
+                        <p class="text-gray-400 text-center font-medium">{{ t('dashboard.selectFilter') }}</p>
                       </div>
                       <canvas v-else id="chart-pie-vehicle-type"></canvas>
                     </div>
@@ -692,7 +692,7 @@ onMounted(() => {
 
                   <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-md font-bold text-gray-800 mb-4">
-                      Hasil P2H
+                      {{ t('dashboard.p2hResults') }}
                     </h3>
                     <div class="h-80 w-full">
                       <canvas id="chart-pie-hasil"></canvas>
@@ -704,12 +704,12 @@ onMounted(() => {
               <!-- Konten Tahunan -->
               <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-lg font-bold text-gray-800 mb-2">
-                  Grafik P2H Tahunan
+                  {{ t('dashboard.p2hAnnualChart') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2"
-                      >Periode Awal</label
+                      >{{ t('dashboard.startPeriod') }}</label
                     >
                     <input
                       v-model="a"
@@ -720,7 +720,7 @@ onMounted(() => {
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2"
-                      >Periode Akhir</label
+                      >{{ t('dashboard.endPeriod') }}</label
                     >
                     <input
                       v-model="u"
@@ -739,7 +739,7 @@ onMounted(() => {
                     <div class="flex items-center justify-between mb-6">
                       <div>
                         <h6 class="text-gray-900 font-bold text-lg">
-                          Status Kendaraan Per Bulan
+                          {{ t('dashboard.vehicleStatusMonthly') }}
                         </h6>
                       </div>
                     </div>
@@ -755,7 +755,7 @@ onMounted(() => {
                         >
                           <div class="w-3 h-3 rounded-full bg-green-500"></div>
                           <span class="text-xs mr-3 font-semibold text-gray-600"
-                            >Normal</span
+                            >{{ t('dashboard.normal') }}</span
                           >
                         </div>
                         <p class="text-xl font-bold text-green-600">75</p>
@@ -766,7 +766,7 @@ onMounted(() => {
                         >
                           <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                           <span class="text-xs mr-3 font-semibold text-gray-600"
-                            >Abnormal</span
+                            >{{ t('dashboard.abnormal') }}</span
                           >
                         </div>
                         <p class="text-xl font-bold text-yellow-600">15</p>
@@ -777,7 +777,7 @@ onMounted(() => {
                         >
                           <div class="w-3 h-3 rounded-full bg-red-500"></div>
                           <span class="text-xs font-semibold text-gray-600"
-                            >Warning</span
+                            >{{ t('dashboard.warning') }}</span
                           >
                         </div>
                         <p class="text-xl font-bold text-red-600">2</p>

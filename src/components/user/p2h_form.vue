@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import { ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
 import NavBar from "../bar/header-user.vue";
 import Footer from "../bar/footer.vue";
 import { 
@@ -132,7 +130,6 @@ const groupedQuestions = computed(() => {
 
 <template>
   <div class="min-h-screen flex flex-col font-['Montserrat'] bg-gray-50">
-  <div class="min-h-screen flex flex-col font-['Montserrat'] bg-gray-50">
     <NavBar />
 
     <main
@@ -166,16 +163,13 @@ const groupedQuestions = computed(() => {
           <div class="flex flex-col gap-1">
             <div>
               <div class="inline-block px-4 py-2 text-base font-bold rounded-full mb-3" style="background-color: #A7E8BF; color: #1A5C3F;">
-              <div class="inline-block px-4 py-2 text-base font-bold rounded-full mb-3" style="background-color: #A7E8BF; color: #1A5C3F;">
                 Normal
               </div>
-              <p class="text-gray-700 font-regular text-base leading-relaxed">
               <p class="text-gray-700 font-regular text-base leading-relaxed">
                 Bagian kendaraan dalam kondisi baik dan berfungsi normal tanpa ditemukan kerusakan.
               </p>
             </div>
             
-            <div class="mt-4">
             <div class="mt-4">
               <div class="inline-block px-4 py-2 text-base font-bold rounded-full mb-3" style="background-color: #F7E19C; color: #8B6F47;">
                 Abnormal
@@ -185,7 +179,6 @@ const groupedQuestions = computed(() => {
               </p>
             </div>
             
-            <div class="mt-4">
             <div class="mt-4">
               <div class="inline-block px-4 py-2 text-base font-bold rounded-full mb-3" style="background-color: #FFA0A0; color: #8B3A3A;">
                 Warning
@@ -287,23 +280,12 @@ const groupedQuestions = computed(() => {
             </button>
           </div>
         </section>
-
       </div>
     </main>
 
     <Footer />
   </div>
 </template>
-
-<style scoped>
-/* Transisi halus saat keterangan muncul */
-.slide-enter-active { transition: all 0.3s ease-out; }
-.slide-enter-from { opacity: 0; transform: translateY(-10px); }
-
-input[type="radio"] {
-  cursor: pointer;
-}
-</style>
 
 <style scoped>
 /* Transisi halus saat keterangan muncul */

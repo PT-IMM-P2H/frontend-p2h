@@ -1,11 +1,5 @@
 import axios from 'axios';
 
-<<<<<<< HEAD
-// Konfigurasi Axios untuk Backend FastAPI Anda
-const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // Sesuaikan dengan URL Backend Anda
-  withCredentials: true, // WAJIB: Agar HttpOnly Cookie bisa terkirim otomatis
-=======
 // Base URL API backend
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
@@ -13,25 +7,11 @@ const API_BASE_URL = 'http://127.0.0.1:8000';
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // PENTING: Agar cookie (jika ada) bisa dikirim/diterima
->>>>>>> fetch-fe
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-<<<<<<< HEAD
-// Interceptor untuk menambahkan Authorization header di setiap request
-api.interceptors.request.use(
-  (config) => {
-    // Ambil token dari localStorage
-    const token = localStorage.getItem('access_token');
-    
-    // Jika token ada, tambahkan ke Authorization header
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-=======
 // --- 1. INTERCEPTORS (Logika Anda Tetap Dipertahankan) ---
 
 // Request interceptor - tambahkan token JWT ke setiap request
@@ -41,7 +21,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
->>>>>>> fetch-fe
     return config;
   },
   (error) => {
@@ -49,17 +28,6 @@ api.interceptors.request.use(
   }
 );
 
-<<<<<<< HEAD
-// Interceptor untuk handle response error (opsional, untuk auto-logout jika 401)
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired atau invalid - redirect ke login
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user_data');
-      window.location.href = '/login';
-=======
 // Response interceptor - handle error 401 (unauthorized)
 api.interceptors.response.use(
   (response) => {
@@ -75,15 +43,11 @@ api.interceptors.response.use(
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
->>>>>>> fetch-fe
     }
     return Promise.reject(error);
   }
 );
 
-<<<<<<< HEAD
-export default api;
-=======
 // --- 2. API SERVICES TERPUSAT ---
 // Kita bungkus semua endpoint dalam objek agar mudah dipanggil di Component
 
@@ -171,4 +135,3 @@ export default apiService;
 
 // Export named api instance untuk backward compatibility
 export { api };
->>>>>>> fetch-fe

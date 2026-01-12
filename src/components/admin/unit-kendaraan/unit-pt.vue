@@ -849,7 +849,6 @@ const getDateStyle = (dateString) => {
                       >
                         <button
                           @click="editKendaraan(row.id)"
-                          @click="editKendaraan(row.id)"
                           class="p-1 hover:bg-gray-100 rounded transition"
                         >
                           <PencilSquareIcon
@@ -957,7 +956,6 @@ const getDateStyle = (dateString) => {
                         <option value="Hijau">Hijau</option>
                       </select>
                       <ChevronDownIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                         class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       />
                     </div>

@@ -1,9 +1,17 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { computed, ref } from "vue";
+import { ChevronDownIcon, CheckIcon } from "@heroicons/vue/24/outline";
 
 const router = useRouter();
 const isMenuOpen = ref(false);
+const selectedLanguage = ref('id');
+const isLanguageDropdownOpen = ref(false);
+
+const languages = [
+  { code: 'id', label: 'Indonesia', flag: '/image_asset/b_indonesia.png' },
+  { code: 'en', label: 'English', flag: '/image_asset/b_amerika.png' }
+]
 
 const handleLogout = () => {
   router.push("/login");
@@ -58,6 +66,16 @@ const toggleMenu = () => {
 const closeMenu = () => {
   isMenuOpen.value = false;
 };
+
+const toggleLanguageDropdown = () => {
+  isLanguageDropdownOpen.value = !isLanguageDropdownOpen.value;
+};
+
+const handleLanguageSelect = (languageCode) => {
+  selectedLanguage.value = languageCode;
+  isLanguageDropdownOpen.value = false;
+  // TODO: Emit language change event or update global language state
+};
 </script>
 
 <template>
@@ -77,6 +95,47 @@ const closeMenu = () => {
 
     <!-- Desktop Navigation -->
     <nav class="hidden lg:flex items-center gap-4 xl:gap-6 ml-auto">
+      <!-- Language Dropdown -->
+      <div class="relative">
+        <button 
+          @click="toggleLanguageDropdown"
+          class="flex items-center gap-2 hover:opacity-70 transition-all duration-200"
+        >
+          <img :src="languages.find(l => l.code === selectedLanguage).flag" :alt="languages.find(l => l.code === selectedLanguage).label" class="w-7 h-7 rounded-full" />
+          <ChevronDownIcon 
+            :class="[
+              'w-4 h-4 transition-transform duration-300 text-[#523E95]',
+              isLanguageDropdownOpen ? 'rotate-180' : ''
+            ]"
+          />
+        </button>
+
+        <!-- Language Dropdown Menu -->
+        <div
+          v-if="isLanguageDropdownOpen"
+          class="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+        >
+          <button
+            v-for="lang in languages"
+            :key="lang.code"
+            @click="handleLanguageSelect(lang.code)"
+            :class="[
+              'w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-all duration-200',
+              selectedLanguage === lang.code
+                ? 'bg-blue-50 text-blue-600 font-semibold border-l-2 border-l-blue-600'
+                : 'text-gray-700 hover:bg-gray-50'
+            ]"
+          >
+            <img :src="lang.flag" :alt="lang.label" class="w-5 h-5 rounded-full" />
+            <span>{{ lang.label }}</span>
+            <CheckIcon
+              v-if="selectedLanguage === lang.code"
+              class="ml-auto w-4 h-4 text-blue-600"
+            />
+          </button>
+        </div>
+      </div>
+      
       <!-- viewer monitor kendaraan -->
       <button
         @click="hadlemonitor"
@@ -169,6 +228,48 @@ const closeMenu = () => {
       class="lg:hidden fixed top-16 left-0 w-full bg-white/95 backdrop-blur-lg shadow-md z-40 border-b border-gray-200"
     >
       <div class="px-4 py-3 space-y-1">
+        <!-- Language Selector Mobile -->
+        <div class="relative mb-3 pb-3 border-b border-gray-200">
+          <button 
+            @click="toggleLanguageDropdown"
+            class="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left hover:bg-gray-50 rounded-md transition-colors duration-200"
+          >
+            <img :src="languages.find(l => l.code === selectedLanguage).flag" :alt="languages.find(l => l.code === selectedLanguage).label" class="w-5 h-5 rounded-full" />
+            <span class="text-gray-700">{{ languages.find(l => l.code === selectedLanguage).label }}</span>
+            <ChevronDownIcon 
+              :class="[
+                'w-4 h-4 ml-auto transition-transform duration-300 text-[#523E95]',
+                isLanguageDropdownOpen ? 'rotate-180' : ''
+              ]"
+            />
+          </button>
+
+          <!-- Language Dropdown Menu Mobile -->
+          <div
+            v-if="isLanguageDropdownOpen"
+            class="absolute top-full mt-1 left-0 right-0 mx-4 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+          >
+            <button
+              v-for="lang in languages"
+              :key="lang.code"
+              @click="handleLanguageSelect(lang.code)"
+              :class="[
+                'w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-all duration-200',
+                selectedLanguage === lang.code
+                  ? 'bg-blue-50 text-blue-600 font-semibold border-l-2 border-l-blue-600'
+                  : 'text-gray-700 hover:bg-gray-50'
+              ]"
+            >
+              <img :src="lang.flag" :alt="lang.label" class="w-4 h-4 rounded-full" />
+              <span>{{ lang.label }}</span>
+              <CheckIcon
+                v-if="selectedLanguage === lang.code"
+                class="ml-auto w-4 h-4 text-blue-600"
+              />
+            </button>
+          </div>
+        </div>
+        
         <button
           @click="hadleformp2h"
           :class="getButtonClass('form-p2h')"

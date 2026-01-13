@@ -1,100 +1,159 @@
 <script setup>
 import Aside from "../bar/aside.vue";
 import HeaderAdmin from "../bar/header_admin.vue";
-import { UserIcon, ArrowUpIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
-import { onMounted, ref, nextTick, watch } from "vue";
+import { UserIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
+import { onMounted, ref, nextTick, watch, provide } from "vue";
 import Chart from "chart.js/auto";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 let chartInstance = null;
 
 // Variables for date inputs
-const a = ref("1 Januari 2025");
-const u = ref("1 Januari 2026");
+const a = ref("2025-01");
+const u = ref("2026-01");
+
+// Mobile menu state
+const isMobileMenuOpen = ref(false);
+
+// Provide mobile menu toggle function
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+provide('toggleMobileMenu', toggleMobileMenu);
+
+// Data dummy untuk box statistik
+const statisticsData = {
+  totalVehicles: 120,
+  totalNormal: 100,
+  totalAbnormal: 15,
+  totalWarning: 5,
+  totalCompletedP2H: 95,
+  totalPendingP2H: 25
+};
 
 // Variables for vehicle type dropdown
 const isVehicleTypeOpen = ref(false);
 const selectedVehicleType = ref("");
 const vehicleTypes = [
   "Light Vehicle",
-  "Electric Vehicle"
+  "Electric Vehicle",
+  "Double Cabin",
+  "Single Cabin",
+  "Bus",
+  "Ambulance",
 ];
 
-const vehicleData = {
-  labels: [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember",
-  ],
-  datasets: [
-    {
-      label: "Normal (Hijau)",
-      data: [35, 40, 38, 45, 42, 50, 55, 52, 58, 62, 68, 75],
-      borderColor: "#10B981",
-      backgroundColor: "rgba(16, 185, 129, 0.08)",
-      borderWidth: 3,
-      tension: 0.5,
-      fill: true,
-      pointBackgroundColor: "#10B981",
-      pointBorderColor: "#fff",
-      pointBorderWidth: 1,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      pointHoverBorderWidth: 3,
-      segment: {
-        borderDash: [],
-      },
-    },
-    {
-      label: "Abnormal (Kuning)",
-      data: [8, 10, 8, 12, 10, 13, 14, 12, 13, 14, 14, 15],
-      borderColor: "#F59E0B",
-      backgroundColor: "rgba(245, 158, 11, 0.08)",
-      borderWidth: 3,
-      tension: 0.5,
-      fill: true,
-      pointBackgroundColor: "#F59E0B",
-      pointBorderColor: "#fff",
-      pointBorderWidth: 1,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      pointHoverBorderWidth: 3,
-      segment: {
-        borderDash: [],
-      },
-    },
-    {
-      label: "Warning (Merah)",
-      data: [2, 2, 2, 4, 3, 4, 3, 4, 3, 3, 3, 2],
-      borderColor: "#EF4444",
-      backgroundColor: "rgba(239, 68, 68, 0.08)",
-      borderWidth: 3,
-      tension: 0.5,
-      fill: true,
-      pointBackgroundColor: "#EF4444",
-      pointBorderColor: "#fff",
-      pointBorderWidth: 1,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      pointHoverBorderWidth: 3,
-      segment: {
-        borderDash: [],
-      },
-    },
-  ],
+const vehicleDataByMonth = {
+  "Januari": [35, 8, 2],
+  "Februari": [40, 10, 2],
+  "Maret": [38, 8, 2],
+  "April": [45, 12, 4],
+  "Mei": [42, 10, 3],
+  "Juni": [50, 13, 4],
+  "Juli": [55, 14, 3],
+  "Agustus": [52, 12, 4],
+  "September": [58, 13, 3],
+  "Oktober": [62, 14, 3],
+  "November": [68, 14, 3],
+  "Desember": [75, 15, 2],
 };
 
-const chartOptions = {
+// Convert monthly data to Chart.js format
+const convertMonthlyDataToChartFormat = (monthlyData) => {
+  const months = Object.keys(monthlyData);
+  const normalData = [];
+  const abnormalData = [];
+  const warningData = [];
+
+  months.forEach(month => {
+    const [normal, abnormal, warning] = monthlyData[month];
+    normalData.push(normal);
+    abnormalData.push(abnormal);
+    warningData.push(warning);
+  });
+
+  return {
+    labels: months,
+    datasets: [
+      {
+        label: "Normal",
+        data: normalData,
+        borderColor: "#10B981",
+        backgroundColor: "rgba(16, 185, 129, 0.08)",
+        borderWidth: 3,
+        tension: 0.5,
+        fill: true,
+        pointBackgroundColor: "#10B981",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 1,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBorderWidth: 3,
+        segment: {
+          borderDash: [],
+        },
+      },
+      {
+        label: "Abnormal",
+        data: abnormalData,
+        borderColor: "#F59E0B",
+        backgroundColor: "rgba(245, 158, 11, 0.08)",
+        borderWidth: 3,
+        tension: 0.5,
+        fill: true,
+        pointBackgroundColor: "#F59E0B",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 1,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBorderWidth: 3,
+        segment: {
+          borderDash: [],
+        },
+      },
+      {
+        label: "Warning",
+        data: warningData,
+        borderColor: "#EF4444",
+        backgroundColor: "rgba(239, 68, 68, 0.08)",
+        borderWidth: 3,
+        tension: 0.5,
+        fill: true,
+        pointBackgroundColor: "#EF4444",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 1,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBorderWidth: 3,
+        segment: {
+          borderDash: [],
+        },
+      },
+    ],
+  };
+};
+
+const vehicleData = convertMonthlyDataToChartFormat(vehicleDataByMonth);
+
+// Function untuk menghitung nilai maksimal dari data dan tambahkan 20
+const getMaxValue = (data) => {
+  let max = 0;
+  data.datasets.forEach(dataset => {
+    const datasetMax = Math.max(...dataset.data);
+    if (datasetMax > max) max = datasetMax;
+  });
+  return max + 20;
+};
+
+const getChartOptions = (data) => {
+  const maxValue = getMaxValue(data);
+  
+  return {
   responsive: true,
-  maintainAspectRatio: true,
+  maintainAspectRatio: false,
   animation: {
     duration: 2000,
     easing: "easeInOutQuart",
@@ -108,7 +167,7 @@ const chartOptions = {
   },
   plugins: {
     legend: {
-      display: true,
+      display: false,
       position: "top",
       labels: {
         usePointStyle: true,
@@ -171,7 +230,7 @@ const chartOptions = {
   scales: {
     y: {
       beginAtZero: true,
-      max: 100,
+      max: maxValue,
       ticks: {
         stepSize: 20,
         font: {
@@ -212,6 +271,7 @@ const chartOptions = {
     mode: "index",
     intersect: false,
   },
+  };
 };
 
 let pieChartInstance = null;
@@ -354,7 +414,7 @@ const initChart = async () => {
     chartInstance = new Chart(canvas, {
       type: "line",
       data: vehicleData,
-      options: chartOptions,
+      options: getChartOptions(vehicleData),
     });
   } catch (error) {
     console.error("Error creating chart:", error);
@@ -440,141 +500,148 @@ onMounted(() => {
 <template>
   <div class="min-h-screen flex flex-col font-['Montserrat']">
     <div class="flex flex-1">
-      <Aside />
+      <!-- Aside dengan props untuk mobile control -->
+      <div class="hidden lg:block fixed lg:relative w-62 h-screen">
+        <Aside :isOpen="true" :onClose="() => {}" />
+      </div>
+      <!-- Mobile aside overlay -->
+      <div class="block lg:hidden">
+        <Aside :isOpen="isMobileMenuOpen" :onClose="toggleMobileMenu" />
+      </div>
 
-      <div class="flex flex-col flex-1 ml-62">
+      <div class="flex flex-col flex-1 lg:ml-0">
         <HeaderAdmin />
 
         <!-- Konten Utama -->
         <main
-          class="bg-[#EFEFEF] flex-1 flex items-start justify-center overflow-y-auto p-3"
+          class="bg-[#EFEFEF] flex-1 flex items-start justify-center overflow-y-auto p-1 sm:p-1 md:p-2 lg:p-1"
         >
-          <div class="w-full">
+          <div class="w-full p-2">
             <!-- 6 Konten Sejajar -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 sm:gap-2">
               <!-- Box 1 -->
               <div
-                class="bg-white rounded-lg shadow-md p-2 flex items-start gap-2 min-h-1"
+                class="bg-white rounded-lg shadow-md p-1.5 sm:p-2 flex items-start gap-1.5 sm:gap-2 min-h-1"
               >
-                <UserIcon class="w-8 h-8 text-black shrink-0 mt-1" />
-                <div class="flex flex-col flex-1">
-                  <p class="text-xs font-regular text-gray-500">
-                    Total unit kendaraan
+                <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <p class="text-xs font-regular text-gray-500 truncate">
+                    {{ t('dashboard.totalVehicles') }}
                   </p>
-                  <h3 class="text-md font-bold text-black mt-1">Total</h3>
+                  <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalVehicles }}</h3>
                 </div>
               </div>
 
               <!-- Box 2 -->
               <div
-                class="bg-white rounded-lg shadow-md p-2 flex items-start gap-2 min-h-1"
+                class="bg-white rounded-lg shadow-md p-1.5 sm:p-2 flex items-start gap-1.5 sm:gap-2 min-h-1"
               >
-                <UserIcon class="w-8 h-8 text-black shrink-0 mt-1" />
-                <div class="flex flex-col flex-1">
-                  <p class="text-xs font-regular text-gray-500">
-                    Total status normal
+                <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <p class="text-xs font-regular text-gray-500 truncate">
+                    {{ t('dashboard.totalNormal') }}
                   </p>
-                  <h3 class="text-md font-bold text-black mt-1">Total</h3>
+                  <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalNormal }}</h3>
                 </div>
               </div>
 
               <!-- Box 3 -->
               <div
-                class="bg-white rounded-lg shadow-md p-2 flex items-start gap-2 min-h-1"
+                class="bg-white rounded-lg shadow-md p-1.5 sm:p-2 flex items-start gap-1.5 sm:gap-2 min-h-1"
               >
-                <UserIcon class="w-8 h-8 text-black shrink-0 mt-1" />
-                <div class="flex flex-col flex-1">
-                  <p class="text-xs font-regular text-gray-500">
-                    Total status abnromal
+                <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <p class="text-xs font-regular text-gray-500 truncate">
+                    {{ t('dashboard.totalAbnormal') }}
                   </p>
-                  <h3 class="text-md font-bold text-black mt-1">Total</h3>
+                  <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalAbnormal }}</h3>
                 </div>
               </div>
 
               <!-- Box 4 -->
               <div
-                class="bg-white rounded-lg shadow-md p-2 flex items-start gap-2 min-h-1"
+                class="bg-white rounded-lg shadow-md p-1.5 sm:p-2 flex items-start gap-1.5 sm:gap-2 min-h-1"
               >
-                <UserIcon class="w-8 h-8 text-black shrink-0 mt-1" />
-                <div class="flex flex-col flex-1">
-                  <p class="text-xs font-regular text-gray-500">
-                    Total status warning
+                <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <p class="text-xs font-regular text-gray-500 truncate">
+                    {{ t('dashboard.totalWarning') }}
                   </p>
-                  <h3 class="text-md font-bold text-black mt-1">Total</h3>
+                  <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalWarning }}</h3>
                 </div>
               </div>
 
               <!-- Box 5 -->
               <div
-                class="bg-white rounded-lg shadow-md p-2 flex items-start gap-2 min-h-1"
+                class="bg-white rounded-lg shadow-md p-1.5 sm:p-2 flex items-start gap-1.5 sm:gap-2 min-h-1"
               >
-                <UserIcon class="w-8 h-8 text-black shrink-0 mt-1" />
-                <div class="flex flex-col flex-1">
-                  <p class="text-xs font-regular text-gray-500">
-                    Total unit sudah P2H
+                <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <p class="text-xs font-regular text-gray-500 truncate">
+                    {{ t('dashboard.totalCompletedP2H') }}
                   </p>
-                  <h3 class="text-md font-bold text-black mt-1">Total</h3>
+                  <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalCompletedP2H }}</h3>
                 </div>
               </div>
 
               <!-- Box 6 -->
               <div
-                class="bg-white rounded-lg shadow-md p-2 flex items-start gap-2 min-h-1"
+                class="bg-white rounded-lg shadow-md p-1.5 sm:p-2 flex items-start gap-1.5 sm:gap-2 min-h-1"
               >
-                <UserIcon class="w-8 h-8 text-black shrink-0 mt-1" />
-                <div class="flex flex-col flex-1">
-                  <p class="text-xs font-regular text-gray-500">
-                    Total unit belum P2H
+                <UserIcon class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-black shrink-0 mt-0.5" />
+                <div class="flex flex-col flex-1 min-w-0">
+                  <p class="text-xs font-regular text-gray-500 truncate">
+                    {{ t('dashboard.totalPendingP2H') }}
                   </p>
-                  <h3 class="text-md font-bold text-black mt-1">Total</h3>
+                  <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-black mt-0.5 sm:mt-1">{{ statisticsData.totalPendingP2H }}</h3>
                 </div>
               </div>
             </div>
 
             <!-- Konten kedua -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-              <div class="flex flex-col w-full max-w-5xl gap-2">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 md:gap-2 mt-2 sm:mt-3 md:mt-4">
+              <div class="flex flex-col w-full gap-2 sm:gap-3">
                 <!-- Konten Kiri -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                  <h2 class="text-lg font-bold text-gray-800 mb-4">
-                    Filter hari
+                <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
+                  <h2 class="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-2 sm:mb-3 md:mb-4">
+                    {{ t('dashboard.filterDay') }}
                   </h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <div>
                       <label
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                        >Tanggal Mulai</label
+                        class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2"
+                        >{{ t('dashboard.startDate') }}</label
                       >
                       <input
                         v-model="a"
                         type="date"
-                        class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        class="w-full p-1.5 sm:p-2 text-xs sm:text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
                     </div>
                     <div>
                       <label
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                        >Tanggal Akhir</label
+                        class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2"
+                        >{{ t('dashboard.endDate') }}</label
                       >
                       <input
                         v-model="u"
                         type="date"
-                        class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        class="w-full p-1.5 sm:p-2 text-xs sm:text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
                     </div>
                   </div>
-                  <div class="grid grid-cols-2 gap-3">
+                  <div class="grid grid-cols-2 gap-2 sm:gap-3">
                     <button
                       type="button"
-                      class="w-full p-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                      class="w-full p-1.5 sm:p-2 bg-indigo-600 text-white text-xs sm:text-sm font-semibold rounded-md hover:bg-indigo-700 transition-colors duration-200"
                     >
-                      Terapkan Filter
+                      {{ t('dashboard.applyFilter') }}
                     </button>
                     <button
                       type="button"
-                      class="w-full p-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-md hover:bg-gray-400 transition-colors duration-200"
+                      class="w-full p-1.5 sm:p-2 bg-gray-300 text-gray-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-gray-400 transition-colors duration-200"
                     >
-                      Reset Filter
+                      {{ t('dashboard.resetFilter') }}
                     </button>
                   </div>
                 </div>
@@ -586,7 +653,7 @@ onMounted(() => {
                     class="w-full bg-white rounded-lg shadow-md p-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
                   >
                     <p class="text-sm font-semibold text-gray-800">
-                      {{ selectedVehicleType || "Tipe Kendaraan" }}
+                      {{ selectedVehicleType || t('dashboard.vehicleType') }}
                     </p>
                     <ChevronDownIcon 
                       :class="['w-5 h-5 text-gray-800 transition-transform duration-200', isVehicleTypeOpen && 'rotate-180']" 
@@ -613,11 +680,11 @@ onMounted(() => {
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-md font-bold text-gray-800 mb-4">
-                      Status {{ selectedVehicleType || 'Tipe Kendaraan' }}
+                      {{ t('dashboard.statusVehicleType') }} {{ selectedVehicleType || t('dashboard.vehicleType') }}
                     </h3>
-                    <div class="h-74 w-full">
+                    <div class="h-80 w-full">
                       <div v-if="!selectedVehicleType" class="h-full flex items-center justify-center">
-                        <p class="text-gray-400 text-center font-medium">Pilih filter untuk menampilkan</p>
+                        <p class="text-gray-400 text-center font-medium">{{ t('dashboard.selectFilter') }}</p>
                       </div>
                       <canvas v-else id="chart-pie-vehicle-type"></canvas>
                     </div>
@@ -625,9 +692,9 @@ onMounted(() => {
 
                   <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-md font-bold text-gray-800 mb-4">
-                      Hasil P2H
+                      {{ t('dashboard.p2hResults') }}
                     </h3>
-                    <div class="h-74 w-full">
+                    <div class="h-80 w-full">
                       <canvas id="chart-pie-hasil"></canvas>
                     </div>
                   </div>
@@ -637,57 +704,46 @@ onMounted(() => {
               <!-- Konten Tahunan -->
               <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-lg font-bold text-gray-800 mb-2">
-                  Grafik P2H Tahunan
+                  {{ t('dashboard.p2hAnnualChart') }}
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2"
-                      >Periode Awal</label
+                      >{{ t('dashboard.startPeriod') }}</label
                     >
                     <input
                       v-model="a"
-                      type="text"
-                      placeholder="1 Januari 2025"
-                      disabled
-                      class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
+                      type="month"
+                      placeholder="Januari 2025"
+                      class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer"
                     />
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2"
-                      >Periode Akhir</label
+                      >{{ t('dashboard.endPeriod') }}</label
                     >
                     <input
                       v-model="u"
-                      type="text"
-                      placeholder="1 Januari 2026"
-                      disabled
-                      class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#EEEEEE] text-[#777777] rounded-md cursor-not-allowed"
+                      type="month"
+                      placeholder="Januari 2026"
+                      class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer"
                     />
                   </div>
                 </div>
 
                 <!-- Grafik tahunan -->
-                <div class="mt-4">
+                <div class="mt-5">
                   <div
-                    class="w-full bg-linear-to-br from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
+                    class="w-full bg-linear-to-br h-full from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
                   >
                     <div class="flex items-center justify-between mb-6">
                       <div>
                         <h6 class="text-gray-900 font-bold text-lg">
-                          Status Kendaraan Per Bulan
+                          {{ t('dashboard.vehicleStatusMonthly') }}
                         </h6>
-                        <p class="text-sm text-gray-600 leading-normal mt-1">
-                          <ArrowUpIcon
-                            class="inline w-4 h-4 text-lime-500 mr-1"
-                          />
-                          <span class="font-semibold text-gray-800"
-                            >12% lebih tinggi</span
-                          >
-                          <span class="text-gray-500"> dari tahun lalu</span>
-                        </p>
                       </div>
                     </div>
-                    <div class="w-full h-70 relative">
+                    <div class="w-full h-80 relative">
                       <canvas id="chart-vehicles"></canvas>
                     </div>
                     <div
@@ -699,7 +755,7 @@ onMounted(() => {
                         >
                           <div class="w-3 h-3 rounded-full bg-green-500"></div>
                           <span class="text-xs mr-3 font-semibold text-gray-600"
-                            >Normal</span
+                            >{{ t('dashboard.normal') }}</span
                           >
                         </div>
                         <p class="text-xl font-bold text-green-600">75</p>
@@ -710,7 +766,7 @@ onMounted(() => {
                         >
                           <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
                           <span class="text-xs mr-3 font-semibold text-gray-600"
-                            >Abnormal</span
+                            >{{ t('dashboard.abnormal') }}</span
                           >
                         </div>
                         <p class="text-xl font-bold text-yellow-600">15</p>
@@ -721,7 +777,7 @@ onMounted(() => {
                         >
                           <div class="w-3 h-3 rounded-full bg-red-500"></div>
                           <span class="text-xs font-semibold text-gray-600"
-                            >Warning</span
+                            >{{ t('dashboard.warning') }}</span
                           >
                         </div>
                         <p class="text-xl font-bold text-red-600">2</p>

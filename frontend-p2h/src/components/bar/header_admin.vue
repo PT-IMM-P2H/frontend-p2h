@@ -77,6 +77,7 @@ onMounted(() => {
       <!-- User Circle Icon Button -->
       <button 
         @click="goToProfile"
+        aria-label="Buka profil pengguna"
         class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center hover:bg-indigo-200 transition-colors duration-200 cursor-pointer"
       >
         <UserCircleIcon class="w-10 h-10 text-black hover:text-indigo-600 transition-colors duration-200" />

@@ -385,7 +385,7 @@ onMounted(() => {
 
         <section v-if="p2hStatus?.color !== 'green' && isAuthenticated && questions.length > 0" class="space-y-6 pb-10">
           <div v-for="(items, section) in groupedQuestions" :key="section" class="p-8 bg-white rounded-2xl shadow-sm border border-zinc-200 space-y-6">
-            <h3 class="text-xl font-black text-zinc-900 border-b-2 border-zinc-100 pb-3">{{ section }}</h3>
+            <h3 class="text-xl font-black text-zinc-900 border-b-2 border-zinc-100 pb-3">{{ vehicleData?.vehicle_type || section }}</h3>
             
             <div v-for="q in items" :key="q.id" class="space-y-4">
               <p class="font-black text-zinc-800 text-lg">{{ q.pertanyaan }}</p>

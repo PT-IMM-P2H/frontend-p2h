@@ -97,7 +97,11 @@ const handleWaLink = () => {
       class="w-105 h-auto bg-white rounded-[15px] flex items-center justify-center p-2.5 m-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.2),0_2px_8px_rgba(0,0,0,0.15)]"
     >
       <div class="w-full px-7.5 py-5 flex flex-col gap-3.75">
-        <img src="/image_asset/IMM.svg" class="w-37.5 h-auto block mx-auto" />
+        <img 
+          src="/image_asset/IMM.svg" 
+          alt="Logo PT Indominco Mandiri" 
+          class="w-37.5 h-auto block mx-auto" 
+        />
 
         <p
           class="m-0 mb-1 mt-3 leading-tight text-center text-black text-[14px] font-sans font-medium mx-auto"
@@ -134,6 +138,7 @@ const handleWaLink = () => {
             <button
               type="button"
               @click="togglePasswordVisibility"
+              :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
               class="absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none p-0 cursor-pointer w-5 h-5 flex items-center justify-center transition-all duration-300 hover:opacity-70"
             >
               <EyeIcon

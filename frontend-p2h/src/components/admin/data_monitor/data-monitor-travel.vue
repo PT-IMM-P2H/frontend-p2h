@@ -73,7 +73,12 @@ const fetchP2HReports = async () => {
 
 // Format data dari backend ke format tabel
 const tableData = computed(() => {
-  return p2hReports.value.map(report => ({
+  // Filter hanya data dengan kategori TRAVEL
+  const filteredReports = p2hReports.value.filter(report => 
+    report.user.kategori_pengguna === 'TRAVEL'
+  );
+  
+  return filteredReports.map(report => ({
     id: report.id,
     tanggal: report.submission_date,
     waktu: report.submission_time,
@@ -84,6 +89,8 @@ const tableData = computed(() => {
     tipe: report.vehicle.vehicle_type,
     merek: report.vehicle.merk || '-',
     namaPemeriksa: report.user.full_name,
+    kategoriLayanan: 'Travel',
+    perusahaan: report.user.company?.nama_perusahaan || '-',
     hasil: report.overall_status === 'normal' ? 'Normal' : 
            report.overall_status === 'abnormal' ? 'Abnormal' : 'Warning',
     hasilRaw: report.overall_status
@@ -370,6 +377,16 @@ onMounted(() => {
                         Shift
                       </th>
                       <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Kategori Layanan
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-28"
+                      >
+                        Perusahaan
+                      </th>
+                      <th
                         class="px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap min-w-20"
                       >
                         Hasil
@@ -431,7 +448,17 @@ onMounted(() => {
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20"
                       >
-                        Shift {{ row.shift }}
+                        {{ row.shift }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
+                        {{ row.kategoriLayanan }}
+                      </td>
+                      <td
+                        class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-28"
+                      >
+                        {{ row.perusahaan }}
                       </td>
                       <td
                         class="px-4 py-3 text-gray-800 text-xs whitespace-nowrap min-w-20"

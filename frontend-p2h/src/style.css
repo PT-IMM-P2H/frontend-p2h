@@ -59,6 +59,8 @@ html {
   height: 100%;
   margin: 0;
   padding: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 :root {
@@ -108,29 +110,18 @@ a:hover {
   background: #959595;
 }
 
-/* Screen Reader Only - for accessibility */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
 /* Date Input Styling */
 input[type="date"],
 input[type="time"],
-input[type="datetime-local"] {
+input[type="datetime-local"],
+input[type="month"] {
   color: #333333;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator,
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   filter: invert(0.3);
   opacity: 1;
@@ -140,8 +131,22 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 input[type="date"]::-webkit-clear-button,
 input[type="time"]::-webkit-clear-button,
-input[type="datetime-local"]::-webkit-clear-button {
+input[type="datetime-local"]::-webkit-clear-button,
+input[type="month"]::-webkit-clear-button {
   display: none;
+}
+
+/* Month Input Specific Styling */
+input[type="month"] {
+  font-size: 16px;
+  padding: 8px 12px;
+  letter-spacing: 0.5px;
+}
+
+input[type="month"]:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 @media (prefers-color-scheme: light) {
@@ -155,4 +160,9 @@ input[type="datetime-local"]::-webkit-clear-button {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* Ensure italic styling works */
+.italic {
+  font-style: oblique 10deg !important;
 }

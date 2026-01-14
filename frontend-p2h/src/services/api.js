@@ -1,49 +1,81 @@
 import axios from 'axios';
-
-// Base URL API backend
-const API_BASE_URL = 'http://127.0.0.1:8000';
+import { API_BASE_URL, API_TIMEOUT } from '../config/app.config';
+import { STORAGE_KEYS, HTTP_STATUS } from '../constants';
+import { logger } from '../utils/logger';
 
 // Buat instance axios
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // PENTING: Agar cookie (jika ada) bisa dikirim/diterima
+  timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// --- 1. INTERCEPTORS (Logika Anda Tetap Dipertahankan) ---
+// --- INTERCEPTORS ---
 
 // Request interceptor - tambahkan token JWT ke setiap request
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
+    // Add timestamp for request tracking
+    config.metadata = { startTime: new Date() };
+    
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Log API request in debug mode
+    logger.apiRequest(config.method, config.url, config.data || config.params);
+    
     return config;
   },
   (error) => {
+    logger.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor - handle error 401 (unauthorized)
+// Response interceptor - handle responses and errors
 api.interceptors.response.use(
   (response) => {
+    // Calculate request duration
+    const duration = new Date() - response.config.metadata.startTime;
+    
+    // Log API response in debug mode
+    logger.apiResponse(response.config.method, response.config.url, response.data, duration);
+    
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
+    // Log API error
+    logger.apiError(
+      error.config?.method || 'UNKNOWN',
+      error.config?.url || 'UNKNOWN',
+      error.response?.data || error.message
+    );
+    
+    // Handle specific error codes
+    if (error.response?.status === HTTP_STATUS.UNAUTHORIZED) {
       // Token expired atau invalid, bersihkan storage & redirect
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user_data');
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER_DATA);
 
       // Cek agar tidak redirect loop jika user sudah di halaman login
       if (window.location.pathname !== '/login') {
+        logger.warn('Unauthorized access, redirecting to login...');
         window.location.href = '/login';
       }
+    } else if (error.response?.status === HTTP_STATUS.FORBIDDEN) {
+      logger.warn('Access forbidden:', error.response.data);
+    } else if (error.code === 'ECONNABORTED') {
+      logger.error('Request timeout:', error.config.url);
+    } else if (!error.response) {
+      logger.error('Network error - server may be down');
     }
+    
     return Promise.reject(error);
   }
 );

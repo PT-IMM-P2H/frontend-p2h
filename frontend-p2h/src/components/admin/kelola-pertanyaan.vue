@@ -140,7 +140,7 @@ const vehicleTypes = ref(
 const fetchPertanyaan = async () => {
   try {
     loading.value = true;
-    const response = await api.get("/p2h/checklist");
+    const response = await api.get("/p2h/checklist-items");
     if (response.data.status === "success") {
       // Transform backend data ke format frontend
       pertanyaanList.value = response.data.payload.map(item => ({
@@ -423,36 +423,34 @@ const simpanPertanyaan = async () => {
                       v-for="vehicle in vehicleList"
                       :key="vehicle.id"
                       @click="vehicleTypes[vehicle.id] = !vehicleTypes[vehicle.id]"
-                      class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer"
+                      class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer hover:shadow-md active:scale-95"
                       :class="
                         vehicleTypes[vehicle.id]
                           ? 'border-blue-500 bg-blue-50'
-                          : 'border-[#a9a9a9] bg-white'
+                          : 'border-[#a9a9a9] bg-white hover:border-gray-400'
                       "
                     >
-                      <div class="relative w-5 h-5">
+                      <div class="relative w-5 h-5 shrink-0">
                         <input
                           type="checkbox"
-                          v-model="vehicleTypes[vehicle.id]"
-                          :id="vehicle.id"
-                          class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
+                          :checked="vehicleTypes[vehicle.id]"
+                          :id="`add-${vehicle.id}`"
+                          class="w-5 h-5 pointer-events-none rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
                           style="
                             appearance: none;
                             -webkit-appearance: none;
                             -moz-appearance: none;
                           "
+                          readonly
                         />
                         <CheckIcon
                           v-if="vehicleTypes[vehicle.id]"
                           class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
                         />
                       </div>
-                      <label
-                        :for="vehicle.id"
-                        class="text-sm text-gray-700 cursor-pointer"
-                      >
+                      <span class="text-sm text-gray-700 select-none">
                         {{ vehicle.label }}
-                      </label>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -589,36 +587,34 @@ const simpanPertanyaan = async () => {
                       v-for="vehicle in vehicleList"
                       :key="vehicle.id"
                       @click="vehicleTypes[vehicle.id] = !vehicleTypes[vehicle.id]"
-                      class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer"
+                      class="flex items-center gap-2 p-2 border rounded-xl transition cursor-pointer hover:shadow-md active:scale-95"
                       :class="
                         vehicleTypes[vehicle.id]
                           ? 'border-blue-500 bg-blue-50'
-                          : 'border-[#a9a9a9] bg-white'
+                          : 'border-[#a9a9a9] bg-white hover:border-gray-400'
                       "
                     >
-                      <div class="relative w-5 h-5">
+                      <div class="relative w-5 h-5 shrink-0">
                         <input
                           type="checkbox"
-                          v-model="vehicleTypes[vehicle.id]"
-                          :id="vehicle.id"
-                          class="w-5 h-5 cursor-pointer rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
+                          :checked="vehicleTypes[vehicle.id]"
+                          :id="`edit-${vehicle.id}`"
+                          class="w-5 h-5 pointer-events-none rounded-md border-2 appearance-none bg-white border-gray-600 checked:bg-blue-500 checked:border-blue-500"
                           style="
                             appearance: none;
                             -webkit-appearance: none;
                             -moz-appearance: none;
                           "
+                          readonly
                         />
                         <CheckIcon
                           v-if="vehicleTypes[vehicle.id]"
                           class="absolute inset-0 m-auto w-4 h-4 text-white pointer-events-none"
                         />
                       </div>
-                      <label
-                        :for="vehicle.id"
-                        class="text-sm text-gray-700 cursor-pointer"
-                      >
+                      <span class="text-sm text-gray-700 select-none">
                         {{ vehicle.label }}
-                      </label>
+                      </span>
                     </div>
                   </div>
                 </div>

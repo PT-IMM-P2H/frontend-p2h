@@ -437,20 +437,12 @@ const sortByName = () => {
 <template>
   <div class="min-h-screen flex flex-col font-['Montserrat']">
     <div class="flex flex-1 overflow-hidden">
-    <div class="flex flex-1 overflow-hidden">
       <Aside />
 
       <div class="flex flex-col flex-1 ml-62 overflow-hidden">
         <HeaderAdmin />
 
         <!-- Content -->
-        <main class="bg-[#EFEFEF] flex-1 flex flex-col p-3 overflow-hidden">
-          <!-- Judul -->
-          <div
-            class="bg-white rounded-lg shadow-md p-1 pl-5 mb-2 -mt-1 shrink-0"
-          >
-            <h1 class="text-base font-bold text-[#523E95] text-left">
-              Travel
         <main class="bg-[#EFEFEF] flex-1 flex flex-col p-3 overflow-hidden">
           <!-- Judul -->
           <div

@@ -10,7 +10,7 @@ import {
   PlusIcon,
 } from "@heroicons/vue/24/outline";
 import { PencilIcon, ChevronDownIcon } from "@heroicons/vue/24/solid";
-import { api } from "../../services/api";
+import apiService from "../../services/api";
 
 const tambahPertanyaan = ref(false);
 const editPertanyaan = ref(false);
@@ -81,7 +81,7 @@ const simpanEditPertanyaan = async () => {
           item_order: editingPertanyaan.value.item_order || 1
         };
         
-        const response = await api.put(`/p2h/checklist/${editingPertanyaan.value.id}`, payload);
+        const response = await apiService.checklist.update(editingPertanyaan.value.id, payload);
         
         if (response.data.status === "success") {
           await fetchPertanyaan(); // Reload data
@@ -140,7 +140,8 @@ const vehicleTypes = ref(
 const fetchPertanyaan = async () => {
   try {
     loading.value = true;
-    const response = await api.get("/p2h/checklist");
+    // Using /p2h/checklist-items endpoint (same as p2h_form.vue)
+    const response = await apiService.checklist.getAll();
     if (response.data.status === "success") {
       // Transform backend data ke format frontend
       pertanyaanList.value = response.data.payload.map(item => ({
@@ -164,6 +165,8 @@ const fetchPertanyaan = async () => {
     }
   } catch (error) {
     console.error("Error fetching pertanyaan:", error);
+    // Show user-friendly error message
+    console.error("API endpoint may not be implemented. Please check with backend team.");
   } finally {
     loading.value = false;
   }
@@ -183,7 +186,7 @@ const konfirmasiHapus = async () => {
   if (pertanyaanToDelete.value) {
     try {
       loading.value = true;
-      const response = await api.delete(`/p2h/checklist/${pertanyaanToDelete.value.id}`);
+      const response = await apiService.checklist.delete(pertanyaanToDelete.value.id);
       
       if (response.data.status === "success") {
         await fetchPertanyaan(); // Reload data
@@ -237,7 +240,7 @@ const simpanPertanyaan = async () => {
           item_order: pertanyaanList.value.length + 1
         };
         
-        const response = await api.post("/p2h/checklist", payload);
+        const response = await apiService.checklist.create(payload);
         
         if (response.data.status === "success") {
           await fetchPertanyaan(); // Reload data
@@ -245,7 +248,9 @@ const simpanPertanyaan = async () => {
         }
       } catch (error) {
         console.error("Error saving pertanyaan:", error);
-        alert("Gagal menyimpan pertanyaan: " + (error.response?.data?.detail || error.message));
+        console.error("Response data:", error.response?.data);
+        const errorMsg = error.response?.data?.detail || error.response?.data?.message || error.message;
+        alert("Gagal menyimpan pertanyaan: " + errorMsg);
       } finally {
         loading.value = false;
       }
@@ -263,10 +268,6 @@ const simpanPertanyaan = async () => {
       <!-- CONTENT -->
       <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
         <HeaderAdmin class="shrink-0" />
-      <!-- CONTENT -->
-      <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
-        <HeaderAdmin class="shrink-0" />
-
         <!-- Content -->
         <main
           class="bg-[#EFEFEF] flex-1 flex flex-col p-3 min-h-0 overflow-hidden"
@@ -776,6 +777,5 @@ const simpanPertanyaan = async () => {
         </main>
       </div>
     </div>
-  </div>
   </div>
 </template>

@@ -92,6 +92,7 @@ const apiService = {
   checklist: {
     getAll: () => api.get('/checklist'), // Admin: Semua pertanyaan
     create: (data) => api.post('/checklist', data), // Admin: Tambah
+    update: (id, data) => api.put(`/checklist/${id}`, data), // Admin: Edit
     delete: (id) => api.delete(`/checklist/${id}`), // Admin: Hapus
     // User: Mengambil checklist aktif untuk form P2H
     getActive: (vehicleType) => api.get(`/p2h/checklist/${vehicleType}`),

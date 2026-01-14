@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/vue/24/solid";
 import { PhoneIcon } from "@heroicons/vue/24/outline";
-import api from "../services/api";
+import { api } from "../services/api";
 
 const router = useRouter();
 const showPassword = ref(false);
@@ -12,7 +12,7 @@ const showForgotPasswordModal = ref(false);
 // Form data
 const phoneNumber = ref("");
 const password = ref("");
-const isLoading = ref(false);
+const loading = ref(false);
 const errorMessage = ref("");
 
 const togglePasswordVisibility = () => {
@@ -26,11 +26,6 @@ const openForgotPasswordModal = () => {
 const closeForgotPasswordModal = () => {
   showForgotPasswordModal.value = false;
 };
-
-const phoneNumber = ref("");
-const password = ref("");
-const loading = ref(false);
-const errorMessage = ref("");
 
 const handleSignIn = async (event) => {
   if (event) event.preventDefault();

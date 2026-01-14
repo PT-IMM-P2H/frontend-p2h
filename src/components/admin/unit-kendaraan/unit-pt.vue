@@ -18,7 +18,7 @@ import {
   ArrowDownIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
-import { PencilIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 import apiService from "@/services/api";
 
 const router = useRouter();
@@ -337,14 +337,6 @@ const toggleSelectAll = () => {
 
 const isRowSelected = (rowId) => {
   return selectedRowIds.value.includes(rowId);
-};
-
-const editKendaraan = (rowId) => {
-  const vehicleData = tableData.value.find(row => row.id === rowId);
-  if (vehicleData) {
-    localStorage.setItem('currentVehicleData', JSON.stringify(vehicleData));
-  }
-  router.push(`/edit-unit-pt/${rowId}`);
 };
 
 // Helper function untuk normalize string (hapus whitespace dan karakter khusus)

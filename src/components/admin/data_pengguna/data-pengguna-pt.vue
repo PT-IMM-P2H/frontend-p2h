@@ -1094,18 +1094,12 @@ const editPengguna = async (rowId) => {
                   >
                   <div class="relative">
                     <select
-                    <select
                       v-model="filterData.namaPerusahaan"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Perusahaan</option>
                     </select>
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
-                    >
-                      <option value="">Pilih Perusahaan</option>
-                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
@@ -1119,18 +1113,12 @@ const editPengguna = async (rowId) => {
                   >
                   <div class="relative">
                     <select
-                    <select
                       v-model="filterData.departemen"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Departemen</option>
                     </select>
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
-                    >
-                      <option value="">Pilih Departemen</option>
-                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
@@ -1144,18 +1132,12 @@ const editPengguna = async (rowId) => {
                   >
                   <div class="relative">
                     <select
-                    <select
                       v-model="filterData.posisi"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Posisi Kerja</option>
                     </select>
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
-                    >
-                      <option value="">Pilih Posisi Kerja</option>
-                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>
@@ -1169,18 +1151,12 @@ const editPengguna = async (rowId) => {
                   >
                   <div class="relative">
                     <select
-                    <select
                       v-model="filterData.status"
                       class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
                     >
                       <option value="">Pilih Status Kerja</option>
                     </select>
-                      class="w-full p-2 pr-10 text-sm border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] appearance-none"
-                    >
-                      <option value="">Pilih Status Kerja</option>
-                    </select>
                     <ChevronDownIcon
-                      class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                       class="absolute right-3 top-2.5 w-5 h-5 text-[#949494] pointer-events-none"
                     />
                   </div>

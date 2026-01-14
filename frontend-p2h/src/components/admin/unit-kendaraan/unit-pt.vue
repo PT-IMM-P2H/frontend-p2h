@@ -297,6 +297,8 @@ const editKendaraan = async (rowId) => {
   } catch (error) {
     console.error('Error fetching vehicle detail:', error);
     alert('Gagal mengambil data kendaraan');
+  } finally {
+    // Cleanup if needed
   }
 };
 

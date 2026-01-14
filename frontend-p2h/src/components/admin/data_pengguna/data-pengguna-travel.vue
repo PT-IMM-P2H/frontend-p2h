@@ -146,6 +146,8 @@ const fetchMasterData = async () => {
     }
   } catch (error) {
     console.error('Error fetching master data:', error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -297,6 +299,8 @@ const editPengguna = async (rowId) => {
   } catch (error) {
     console.error('Error fetching user detail:', error);
     alert('Gagal mengambil data pengguna');
+  } finally {
+    // Cleanup if needed
   }
 };
 

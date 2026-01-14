@@ -45,6 +45,8 @@ const fetchCurrentShift = async () => {
     selectedShift.value = currentShiftInfo.value.current_shift.toString();
   } catch (error) {
     console.error('❌ Gagal mendapatkan info shift:', error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -163,6 +165,8 @@ const fetchChecklist = async (vehicleType) => {
     
   } catch (error) {
     console.error("❌ Gagal memuat checklist", error);
+  } finally {
+    // Cleanup if needed
   }
 };
 

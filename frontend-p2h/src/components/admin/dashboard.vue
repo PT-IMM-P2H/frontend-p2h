@@ -100,6 +100,8 @@ const fetchStatistics = async () => {
     }
   } catch (error) {
     console.error('Error fetching statistics:', error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -127,6 +129,8 @@ const fetchMonthlyReports = async () => {
     }
   } catch (error) {
     console.error('Error fetching monthly reports:', error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -140,6 +144,8 @@ const fetchVehicleTypes = async () => {
     }
   } catch (error) {
     console.error('Error fetching vehicle types:', error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -441,6 +447,8 @@ const fetchVehicleTypeStatus = async () => {
     }
   } catch (error) {
     console.error('Error fetching vehicle type status:', error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -551,6 +559,8 @@ const initChart = async () => {
     });
   } catch (error) {
     console.error("Error creating chart:", error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -579,6 +589,8 @@ const initPieChart = async () => {
     });
   } catch (error) {
     console.error("Error creating pie chart:", error);
+  } finally {
+    // Cleanup if needed
   }
 };
 
@@ -612,6 +624,8 @@ const initVehicleTypeChart = async () => {
     });
   } catch (error) {
     console.error("Error creating vehicle type chart:", error);
+  } finally {
+    // Cleanup if needed
   }
 };
 

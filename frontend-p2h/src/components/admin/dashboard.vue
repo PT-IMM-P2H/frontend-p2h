@@ -11,9 +11,13 @@ const { t } = useI18n();
 
 let chartInstance = null;
 
-// Variables for date inputs
-const a = ref("2025-01");
-const u = ref("2026-01");
+// Variables for date inputs (format YYYY-MM-DD untuk date picker di Filter Hari)
+const a = ref("2025-01-01");
+const u = ref("2026-01-14");
+
+// Variables for month inputs (format YYYY-MM untuk month picker di Grafik Tahunan)
+const annualStartPeriod = ref("2025-01");
+const annualEndPeriod = ref("2026-01");
 
 // Mobile menu state
 const isMobileMenuOpen = ref(false);
@@ -59,7 +63,17 @@ const vehicleDataByMonth = ref({
 // Fetch dashboard statistics dari backend
 const fetchStatistics = async () => {
   try {
-    const response = await api.get('/dashboard/statistics');
+    const params = {};
+    
+    // Add date filters if set
+    if (a.value && a.value !== "") {
+      params.start_date = a.value;
+    }
+    if (u.value && u.value !== "") {
+      params.end_date = u.value;
+    }
+    
+    const response = await api.get('/dashboard/statistics', { params });
     console.log('Statistics response:', response.data);
     if (response.data.status === 'success') {
       const data = response.data.payload;
@@ -381,40 +395,52 @@ const getChartOptions = (data) => {
 let pieChartInstance = null;
 let vehicleTypeChartInstance = null;
 
-const vehicleTypeChartData = {
-  "Light Vehicle": {
-    labels: ["Normal", "Abnormal", "Warning"],
-    datasets: [{
-      data: [100, 8, 2],
-      backgroundColor: [
-        "rgba(16, 185, 129, 0.7)",
-        "rgba(245, 158, 11, 0.7)",
-        "rgba(239, 68, 68, 0.7)",
-      ],
-      borderColor: [
-        "rgba(16, 185, 129, 1)",
-        "rgba(245, 158, 11, 1)",
-        "rgba(239, 68, 68, 1)",
-      ],
-      borderWidth: 2,
-    }]
-  },
-  "Electric Vehicle": {
-    labels: ["Normal", "Abnormal", "Warning"],
-    datasets: [{
-      data: [38, 10, 5],
-      backgroundColor: [
-        "rgba(16, 185, 129, 0.7)",
-        "rgba(245, 158, 11, 0.7)",
-        "rgba(239, 68, 68, 0.7)",
-      ],
-      borderColor: [
-        "rgba(16, 185, 129, 1)",
-        "rgba(245, 158, 11, 1)",
-        "rgba(239, 68, 68, 1)",
-      ],
-      borderWidth: 2,
-    }]
+// Data untuk chart status berdasarkan tipe kendaraan dari backend
+const vehicleTypeStatusData = ref({
+  labels: ["Normal", "Abnormal", "Warning"],
+  datasets: [{
+    data: [0, 0, 0],
+    backgroundColor: [
+      "rgba(16, 185, 129, 0.7)",
+      "rgba(245, 158, 11, 0.7)",
+      "rgba(239, 68, 68, 0.7)",
+    ],
+    borderColor: [
+      "rgba(16, 185, 129, 1)",
+      "rgba(245, 158, 11, 1)",
+      "rgba(239, 68, 68, 1)",
+    ],
+    borderWidth: 2,
+  }]
+});
+
+// Fetch status berdasarkan tipe kendaraan dari backend
+const fetchVehicleTypeStatus = async () => {
+  if (!selectedVehicleType.value) {
+    return;
+  }
+  
+  try {
+    const params = {
+      vehicle_type: selectedVehicleType.value
+    };
+    
+    const response = await api.get('/dashboard/vehicle-type-status', { params });
+    console.log('Vehicle type status response:', response.data);
+    if (response.data.status === 'success') {
+      const data = response.data.payload;
+      vehicleTypeStatusData.value.datasets[0].data = [
+        data.normal || 0,
+        data.abnormal || 0,
+        data.warning || 0
+      ];
+      
+      // Reinit chart setelah data berubah
+      await nextTick();
+      initVehicleTypeChart();
+    }
+  } catch (error) {
+    console.error('Error fetching vehicle type status:', error);
   }
 };
 
@@ -577,14 +603,11 @@ const initVehicleTypeChart = async () => {
     return;
   }
 
-  // Get data berdasarkan selectedVehicleType
-  const chartData = vehicleTypeChartData[selectedVehicleType.value];
-
-  // Create new chart
+  // Create new chart dengan data dari backend
   try {
     vehicleTypeChartInstance = new Chart(vehicleTypeCanvas, {
       type: "pie",
-      data: chartData,
+      data: vehicleTypeStatusData.value,
       options: pieChartOptions,
     });
   } catch (error) {
@@ -595,7 +618,7 @@ const initVehicleTypeChart = async () => {
 // Watch selectedVehicleType untuk update chart dan fetch data baru
 watch(selectedVehicleType, () => {
   fetchMonthlyReports();
-  initVehicleTypeChart();
+  fetchVehicleTypeStatus();
 });
 
 // Update chart dengan data baru
@@ -631,6 +654,27 @@ const monthlyTotals = computed(() => {
     warning: totalWarning
   };
 });
+
+// Fungsi untuk apply filter
+const applyFilter = async () => {
+  // Fetch data dengan filter tanggal
+  await fetchStatistics();
+  await fetchMonthlyReports();
+  if (selectedVehicleType.value) {
+    await fetchVehicleTypeStatus();
+  }
+};
+
+// Fungsi untuk reset filter
+const resetFilter = () => {
+  a.value = "2025-01-01";
+  u.value = "2026-01-14";
+  selectedVehicleType.value = "";
+  
+  // Fetch ulang data tanpa filter
+  fetchStatistics();
+  fetchMonthlyReports();
+};
 
 onMounted(async () => {
   // Fetch data dari backend dulu
@@ -763,7 +807,7 @@ onMounted(async () => {
                       <input
                         id="filter-start-date"
                         v-model="a"
-                        type="month"
+                        type="date"
                         class="w-full p-1.5 sm:p-2 text-xs sm:text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
                     </div>
@@ -776,7 +820,7 @@ onMounted(async () => {
                       <input
                         id="filter-end-date"
                         v-model="u"
-                        type="month"
+                        type="date"
                         class="w-full p-1.5 sm:p-2 text-xs sm:text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
                     </div>
@@ -784,12 +828,14 @@ onMounted(async () => {
                   <div class="grid grid-cols-2 gap-2 sm:gap-3">
                     <button
                       type="button"
+                      @click="applyFilter"
                       class="w-full p-1.5 sm:p-2 bg-indigo-600 text-white text-xs sm:text-sm font-semibold rounded-md hover:bg-indigo-700 transition-colors duration-200"
                     >
                       {{ t('dashboard.applyFilter') }}
                     </button>
                     <button
                       type="button"
+                      @click="resetFilter"
                       class="w-full p-1.5 sm:p-2 bg-gray-300 text-gray-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-gray-400 transition-colors duration-200"
                     >
                       {{ t('dashboard.resetFilter') }}
@@ -864,7 +910,7 @@ onMounted(async () => {
                     >
                     <input
                       id="annual-start-period"
-                      v-model="a"
+                      v-model="annualStartPeriod"
                       type="month"
                       placeholder="Januari 2025"
                       class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer"
@@ -876,7 +922,7 @@ onMounted(async () => {
                     >
                     <input
                       id="annual-end-period"
-                      v-model="u"
+                      v-model="annualEndPeriod"
                       type="month"
                       placeholder="Januari 2026"
                       class="w-full p-2 text-sm border border-[#C3C3C3] bg-[#ffffff] text-[#777777] rounded-md cursor-pointer"

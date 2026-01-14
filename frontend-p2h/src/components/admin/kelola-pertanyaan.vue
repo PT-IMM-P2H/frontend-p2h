@@ -140,7 +140,7 @@ const vehicleTypes = ref(
 const fetchPertanyaan = async () => {
   try {
     loading.value = true;
-    const response = await api.get("/p2h/checklist");
+    const response = await api.get("/p2h/checklist-items");
     if (response.data.status === "success") {
       // Transform backend data ke format frontend
       pertanyaanList.value = response.data.payload.map(item => ({

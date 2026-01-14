@@ -1085,16 +1085,13 @@ const getDateStyle = (dateString) => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >Tanggal STNK</label
                     >
-                    <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="hh/bb/tttt"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
-                      <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                      />
-                    </div>
+                    <input
+                      id="stnk_expiry"
+                      name="stnk_expiry"
+                      v-model="formData.stnk_expiry"
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
                   </div>
                 </div>
 
@@ -1120,16 +1117,13 @@ const getDateStyle = (dateString) => {
                       class="block text-base font-medium text-gray-800 mb-1 mt-1"
                       >KIR / KUER</label
                     >
-                    <div class="relative">
-                      <input
-                        type="text"
-                        placeholder="hh/bb/tttt"
-                        class="w-full p-2 pr-10 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
-                      />
-                      <CalendarIcon
-                        class="absolute right-3 top-2.5 w-5 h-5 text-[#949494]"
-                      />
-                    </div>
+                    <input
+                      id="kir_expiry"
+                      name="kir_expiry"
+                      v-model="formData.kir_expiry"
+                      type="date"
+                      class="w-full p-2 border border-[#C3C3C3] bg-white text-gray-700 rounded-md focus:outline-none focus:border-[#A90CF8] text-sm"
+                    />
                   </div>
                 </div>
 

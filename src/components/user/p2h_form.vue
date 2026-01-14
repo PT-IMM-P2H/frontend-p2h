@@ -9,7 +9,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon 
 } from "@heroicons/vue/24/solid";
-import { api } from "../../services/api";
+import apiService from "../../services/api";
 
 const router = useRouter();
 
@@ -26,13 +26,19 @@ const selectedShift = ref("");
 
 // --- LOGIKA BUSINESS ---
 
+// Helper function untuk normalize nomor lambung (hapus titik, dash, spasi, convert ke uppercase)
+const normalizeVehicleNumber = (str) => {
+  return str.trim().replace(/[\s\-\.]/g, '').toUpperCase();
+};
+
 // 1. Mencari Kendaraan berdasarkan Nomor Lambung
 const handleSearchVehicle = async () => {
   if (!searchInput.value) return;
   
   try {
     loading.value = true;
-    const response = await api.get(`/vehicles/lambung/${searchInput.value}`);
+    const normalizedSearch = normalizeVehicleNumber(searchInput.value);
+    const response = await apiService.vehicles.getByLambung(normalizedSearch);
     vehicleData.value = response.data.payload;
     
     // Setelah unit ditemukan, otomatis ambil checklist-nya
@@ -49,7 +55,7 @@ const handleSearchVehicle = async () => {
 // 2. Mengambil Daftar Pertanyaan Checklist
 const fetchChecklist = async (vehicleType) => {
   try {
-    const response = await api.get('/p2h/checklist-items');
+    const response = await apiService.checklist.getAll();
     
     // Filter pertanyaan berdasarkan vehicle_tags yang cocok dengan jenis kendaraan
     const allQuestions = response.data.payload;
@@ -103,7 +109,7 @@ const handleSubmitReport = async () => {
       }))
     };
 
-    const response = await api.post("/p2h/submit", payload);
+    const response = await apiService.p2h.submit(payload);
     alert(response.data.message || "Laporan P2H Berhasil Dikirim!");
     router.push("/"); 
     
